@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class UIcontroller : MonoBehaviour {
 	public GameObject[] StartScreenPanels;
+	enum logInType { native, google, facebook};
+	logInType currentLogType = logInType.native;
 	/* 0 .startPanel structure:
 		child index | functionality
 			0		| login
@@ -18,6 +20,8 @@ public class UIcontroller : MonoBehaviour {
 				1		| password
 				2		| login
 				3		| back
+			   *4		| login with facebook
+			   *5		| login with google
 		==========================*/
 
 	/* 2.SignupPanel structure:
@@ -53,7 +57,7 @@ public class UIcontroller : MonoBehaviour {
 		signUp.onClick.AddListener(delegate { ChangePanel(2); });
 		signUpBack.onClick.AddListener(delegate { ChangePanel(0); });
 		logInBack.onClick.AddListener(delegate { ChangePanel(0); });
-		logInSubmission.onClick.AddListener(confirmLogIn);
+		logInSubmission.onClick.AddListener(delegate { confirmLogIn(logInType.native); });
 		signUpSubmission.onClick.AddListener(confirmSignUp);
 	}
 
@@ -72,31 +76,58 @@ public class UIcontroller : MonoBehaviour {
 		StartScreenPanels[idx].SetActive(true);		
 	}
 
-	void confirmLogIn() {
+	void confirmLogIn(logInType myType) {
 		string userName = loginUserName.text;
 		string pwd = loginPwd.text;
-		if (submitLogIn(userName, pwd)) {
-			SceneManager.LoadScene("main");
+		switch (myType) {
+			case logInType.native:
+				if (submitLogIn(userName, pwd) == 2) {
+					SceneManager.LoadScene("main");
+				}
+				return;
+			case logInType.facebook:
+				if (logInWithFB(userName, pwd) == 2){
+					SceneManager.LoadScene("main");
+				}
+				return;
+			case logInType.google:
+				if (logInWithGoogle(userName, pwd) == 2){
+					SceneManager.LoadScene("main");
+				}
+				return;
+			default:
+				return;
 		}
 	}
 
 	void confirmSignUp(){
 		string userName = loginUserName.text;
 		string pwd = loginPwd.text;
-		if (submitSignUp(userName, pwd)){
+		if (submitSignUp(userName, pwd)==2){
 			SceneManager.LoadScene("main");
 		}
 	}
+
+
 	#region serverComminication
-	bool submitLogIn(string uid, string pwd) {		
+	int submitLogIn(string uid, string pwd) {		
 		Debug.LogWarning("login with username and password:" + uid + "," + pwd);
-		return true;
+		return 2;
 	}
 
-	bool submitSignUp(string uid, string pwd){
+	int submitSignUp(string uid, string pwd){
 		Debug.LogWarning("login with username and password:" + uid + "," + pwd);
-		return true;
+		return 2;
 	}
 
+	int logInWithFB(string uid, string pwd) {
+		Debug.LogWarning("loging with facebook account.." + uid + "," + pwd);
+		return 2;
+	}
+
+	int logInWithGoogle(string uid, string pwd){
+		Debug.LogWarning("loging with google account.." + uid + "," + pwd);
+		return 2;
+	}
 	#endregion
 }

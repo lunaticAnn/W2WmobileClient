@@ -18,7 +18,8 @@ public class searchController : baseController {
 	public Button searchButton;
 	public GameObject searchPanel;
 	public InputField searchKeywords;
-	Queue<string> keywords;
+
+	LimitedQueue<string> searchTags = new LimitedQueue<string>(10);
 
 	public override void enterState(){
 		//do the registration here? on the main controller for current state

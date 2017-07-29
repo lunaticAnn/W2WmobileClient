@@ -77,4 +77,5 @@ public class mainController : MonoBehaviour {
 		else
 			Debug.Log("Is in search mode, other operations are banned.");
 	}
+
 }
