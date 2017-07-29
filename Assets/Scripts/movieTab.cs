@@ -17,30 +17,24 @@ actor1/actor2/actor3
 --------------------------------------------*/
 	public Text movieDetails;
 	public RawImage poster;
-	string cachingPath = "/StreamingAssets/data_0.json";
-
-	private void Start(){
-		updateMovieContent();
-	}
-
+	public movieInfo myInfo;
 	
-	public bool updateMovieContent () {
-		string filePath = Application.dataPath + cachingPath;
-		string jsStr;
-		if (!File.Exists(filePath))
-			return false;
-		jsStr = File.ReadAllText(filePath);
-		movieInfo myInfo = JsonUtility.FromJson<movieInfo>(jsStr);
-		updateUI(myInfo);
-		return true;
+	public void updateUI(movieInfo m){
+		string tmp = "";
+		tmp += m.movie_title + "\n";
+		tmp += "Director : " + m.director_name + "\n";
+		tmp +=  m.title_year;
+		movieDetails.text = tmp;
+		IEnumerator c = updatePoster(m.image_url);
+		StartCoroutine(c);
 	}
 
-	private void updateUI(movieInfo m){
-		string tmp = "";
-		tmp +="Title:" + m.movie_title + "\n";
-		tmp += "Director:" + m.director_name + "\n";
-		tmp += "Year:" + m.title_year;
-		movieDetails.text = tmp;
+	IEnumerator updatePoster(string url)
+	{
+		// Start a download of the given URL
+		WWW www = new WWW(url);
+		yield return www;
+		poster.texture = www.texture;
 	}
 
 
