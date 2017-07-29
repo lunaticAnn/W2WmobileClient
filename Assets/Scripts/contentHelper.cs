@@ -35,7 +35,7 @@ public class contentHelper : MonoBehaviour {
 		tagTemplate.GetComponent<RectTransform>().localPosition =
 		new Vector3(450f, -110f);
 
-		tagTemplate.GetComponent<movieTab>().updateUI(readFromLocal(0));
+		tagTemplate.GetComponent<movieTab>().updateUI(readFromLocal((int)(Random.value * 499f)));
 
 		for (int i = 1; i < num; i++){
 			GameObject newTag = Instantiate(tagTemplate);
