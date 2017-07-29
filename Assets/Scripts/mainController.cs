@@ -16,13 +16,15 @@ public class mainController : MonoBehaviour {
 	public searchController search;
 	public recommendController recommend;
 	public locationController location;
+	public detailController details;
 
 	#region buttons
 	public Button startNewSearch;
 	public Button viewRecommendation;
 	public Button viewNearby;
+	public Button backToList;
 	#endregion
-	
+
 	//my event info structure
 
 	void Awake() {
@@ -34,10 +36,14 @@ public class mainController : MonoBehaviour {
 		changeStateTo(recommend);
 	}
  
-	bool changeStateTo(baseController toActivate, baseController from = null) {
+	public bool changeStateTo(baseController toActivate, baseController from = null) {
 		if (from){
 			from.exitState();
 			previousController = from;
+		}
+		if (!toActivate) {
+			Debug.LogError("No previous state found, check the FSM.");
+			return false;
 		}
 		toActivate.enterState();
 		return true;
@@ -55,6 +61,7 @@ public class mainController : MonoBehaviour {
 		startNewSearch.onClick.AddListener(startSearchHandler);
 		viewRecommendation.onClick.AddListener(viewRecommendHandler);
 		viewNearby.onClick.AddListener(viewLocationHandler);
+		backToList.onClick.AddListener(delegate { changeStateTo(previousController, activeController); });
 	}
 
 	private void startSearchHandler() {

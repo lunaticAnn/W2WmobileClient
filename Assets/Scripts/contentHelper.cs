@@ -44,7 +44,7 @@ public class contentHelper : MonoBehaviour {
 			r.localScale = Vector3.one;
 			r.localPosition = tagTemplate.GetComponent<RectTransform>().localPosition
 								- new Vector3(0f, i*offset);
-			newTag.GetComponent<movieTab>().updateUI(readFromLocal(i));
+			newTag.GetComponent<movieTab>().updateUI(readFromLocal((int)(Random.value * 499f)));
 		}			
 	}
 

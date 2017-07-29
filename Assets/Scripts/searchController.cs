@@ -18,6 +18,8 @@ public class searchController : baseController {
 	public Button searchButton;
 	public GameObject searchPanel;
 	public InputField searchKeywords;
+	public Sprite exitSearch;
+	public Sprite enterSearch;
 
 	LimitedQueue<string> searchTags = new LimitedQueue<string>(10);
 
@@ -27,6 +29,7 @@ public class searchController : baseController {
 		//open the search panel
 		searchPanel.SetActive(true);
 		searchKeywords.text = "";
+		mainController.instance.startNewSearch.image.sprite = exitSearch;
 		//keywords.Clear();
 		
 	}
@@ -42,6 +45,7 @@ public class searchController : baseController {
 		//de-register on the main controller
 		base.exitState();
 		searchPanel.SetActive(false);
+		mainController.instance.startNewSearch.image.sprite = enterSearch;
 		//close the search panel 	
 	}
 
