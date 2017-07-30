@@ -24,7 +24,11 @@ public class LimitedQueue<T> {
 		return false;		
 	}
 
-	public void Dequeue() {
-		myQueue.Dequeue();
+	public int currentSize() {
+		return myQueue.Count;
+	}
+
+	public T Dequeue() {
+		return myQueue.Dequeue();
 	}
 }

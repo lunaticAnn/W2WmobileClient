@@ -59,6 +59,8 @@ public class UIcontroller : MonoBehaviour {
 		logInBack.onClick.AddListener(delegate { ChangePanel(0); });
 		logInSubmission.onClick.AddListener(delegate { confirmLogIn(logInType.native); });
 		signUpSubmission.onClick.AddListener(confirmSignUp);
+		
+		Input.location.Start();
 	}
 
 	void clearPanels() {
@@ -111,22 +113,37 @@ public class UIcontroller : MonoBehaviour {
 
 	#region serverComminication
 	int submitLogIn(string uid, string pwd) {		
-		Debug.LogWarning("login with username and password:" + uid + "," + pwd);
+		developerLogs.log("login with username and password:" + uid + "," + pwd);
+		developerLogs.log("encoding for password needed");
+		
+		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+						  +Input.location.lastData.latitude);
 		return 2;
 	}
 
 	int submitSignUp(string uid, string pwd){
-		Debug.LogWarning("login with username and password:" + uid + "," + pwd);
+		developerLogs.log("login with username and password:" + uid + "," + pwd);
+		developerLogs.log("encoding for password needed");
+		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+						  + Input.location.lastData.latitude);
 		return 2;
 	}
 
 	int logInWithFB(string uid, string pwd) {
-		Debug.LogWarning("loging with facebook account.." + uid + "," + pwd);
+		developerLogs.log("loging with facebook account.." + uid + "," + pwd);
+		developerLogs.log("encoding for password needed");
+		
+		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+						  + Input.location.lastData.latitude);
 		return 2;
 	}
 
 	int logInWithGoogle(string uid, string pwd){
-		Debug.LogWarning("loging with google account.." + uid + "," + pwd);
+		developerLogs.log("loging with google account.." + uid + "," + pwd);
+		developerLogs.log("encoding for password needed");
+		
+		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+						  + Input.location.lastData.latitude);
 		return 2;
 	}
 	#endregion

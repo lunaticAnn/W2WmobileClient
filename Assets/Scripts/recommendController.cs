@@ -17,6 +17,7 @@ public class recommendController : baseController
 	//singleton
 
 	public GameObject recommendField;
+	public contentHelper recommendHelper;
 
 	public override void enterState()
 	{

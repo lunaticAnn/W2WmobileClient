@@ -9,19 +9,15 @@ public class contentHelper : MonoBehaviour {
 	public GameObject tagTemplate;
 	public int numOfContent;
 
-	const string cachingPathPrefix = "/StreamingAssets/data_";
+	const string cachingPathPrefix = "data_";
 	const float offset = 210f;
 	
-	void Start () {
-		createTags(numOfContent);		
+	void Start () {		
 	}
 
 	movieInfo readFromLocal(int id) {
-		string filePath = Application.dataPath + cachingPathPrefix + id.ToString()+".json";
-		if (!File.Exists(filePath))
-			return null;
-		string jsStr;
-		jsStr = File.ReadAllText(filePath);
+		TextAsset jsFile =Resources.Load(cachingPathPrefix+id.ToString()) as TextAsset;
+		string jsStr = jsFile.text;
 		movieInfo myInfo = JsonUtility.FromJson<movieInfo>(jsStr);
 		return myInfo;
 	}

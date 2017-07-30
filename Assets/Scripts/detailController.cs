@@ -62,8 +62,8 @@ public class detailController : baseController
 		tmp += myInfo.content_rating + "\n\n";
 		tmp += "<size=40><b>Director</b> " + myInfo.director_name + "</size>\n";
 		tmp += "<color=#515151ff>"+myInfo.actor_1_name + "/" 
-			 + myInfo.actor_2_name +"/" 
-			 + myInfo.actor_3_name+ "</color>\n\n";
+			 + myInfo.actor_2_name + "/" 
+			 + myInfo.actor_3_name + "</color>\n\n";
 		tmp += myInfo.description;
 		descriptions.text = tmp;
 		IEnumerator c = updatePoster(myInfo.image_url);

@@ -52,7 +52,14 @@ public class searchController : baseController {
 	#region serverCommunication
 	void queryNewSearch() {
 		string searchContent = searchKeywords.text;
-		Debug.LogWarning("Query new search with keywords:"+searchContent);
+		developerLogs.log("Query new search with keywords:"+searchContent);
+		developerLogs.log("refreshing the content:" + searchContent);
+		mainController.instance.changeStateTo(mainController.instance.recommend,
+											  mainController.instance.activeController);
+		mainController.instance.recommend.recommendHelper.clearTags();
+		mainController.instance.recommend.recommendHelper.createTags(10);
+		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+						  + Input.location.lastData.latitude);
 	}
 	#endregion
 }
