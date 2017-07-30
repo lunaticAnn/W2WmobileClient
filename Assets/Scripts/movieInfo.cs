@@ -16,6 +16,7 @@ public class movieInfo{
 	actor1/actor2/actor3
 	--------------------------------------------*/
 	#region openContent - file to parse
+	public string id;
 	public string movie_title;
 	public string director_name;
 
@@ -44,7 +45,7 @@ public class movieInfo{
 		return JsonUtility.FromJson<movieInfo>(jsonString);
 	}
 
-
+	
 	//#region todo
 	
 	//string trailerLink;

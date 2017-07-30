@@ -35,6 +35,7 @@ public class UIcontroller : MonoBehaviour {
 	public InputField loginPwd;
 	public InputField signUpUserName;
 	public InputField signUpPwd;
+	public InputField signUpName;
 
 	Button signUp;
 	Button signUpBack;
@@ -103,9 +104,10 @@ public class UIcontroller : MonoBehaviour {
 	}
 
 	void confirmSignUp(){
-		string userName = loginUserName.text;
-		string pwd = loginPwd.text;
-		if (submitSignUp(userName, pwd)==2){
+		string userName = signUpUserName.text;
+		string pwd = signUpPwd.text;
+		string name = signUpName.text;
+		if (submitSignUp(userName, pwd, name)==2){
 			SceneManager.LoadScene("main");
 		}
 	}
@@ -121,7 +123,7 @@ public class UIcontroller : MonoBehaviour {
 		return 2;
 	}
 
-	int submitSignUp(string uid, string pwd){
+	int submitSignUp(string uid, string pwd, string name){
 		developerLogs.log("login with username and password:" + uid + "," + pwd);
 		developerLogs.log("encoding for password needed");
 		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","

@@ -55,7 +55,7 @@ public class mainController : MonoBehaviour {
 	*/
 	private void Start(){
 		installHandlers();
-		recommend.recommendHelper.createTags(10);
+		recommend.recommendHelper.createTags(5);
 	}
 
 	void installHandlers() {

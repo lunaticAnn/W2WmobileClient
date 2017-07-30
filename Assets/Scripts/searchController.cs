@@ -12,9 +12,9 @@ public class searchController : baseController {
 		else
 			Destroy(gameObject);
 		searchButton.onClick.AddListener(queryNewSearch);
-		
 	}
 	//singleton
+	
 	public Button searchButton;
 	public GameObject searchPanel;
 	public InputField searchKeywords;
@@ -48,6 +48,15 @@ public class searchController : baseController {
 		mainController.instance.startNewSearch.image.sprite = enterSearch;
 		//close the search panel 	
 	}
+	
+	//alternative way of submitting search
+	private void OnGUI(){
+		if (Event.current.isKey)
+			if (Event.current.keyCode == KeyCode.Return){
+				developerLogs.log("key board event detected.");
+				queryNewSearch();
+			}
+	}
 
 	#region serverCommunication
 	void queryNewSearch() {
@@ -56,7 +65,6 @@ public class searchController : baseController {
 		developerLogs.log("refreshing the content:" + searchContent);
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		mainController.instance.recommend.recommendHelper.clearTags();
 		mainController.instance.recommend.recommendHelper.createTags(10);
 		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
 						  + Input.location.lastData.latitude);

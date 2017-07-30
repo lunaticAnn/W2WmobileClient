@@ -24,8 +24,9 @@ public class locationController : baseController
 		base.enterState();
 		//switch to location panel
 		locationField.SetActive(true); 
-		locationHelper.clearTags();
-		locationHelper.createTags(10);
+	
+		//locationHelper.clearTags();
+		//locationHelper.createTags(10);
 	}
 
 	public override void inputEventHandler(){
