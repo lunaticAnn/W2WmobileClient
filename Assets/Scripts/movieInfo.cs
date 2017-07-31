@@ -36,6 +36,7 @@ public class movieInfo{
 	public float aspect_ratio;
 	public float imdb_score;
 
+	public int num_voted_users;
 	public string movie_imdb_link;
 	public string image_url;
 	public string description;

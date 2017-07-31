@@ -11,17 +11,21 @@ public class searchController : baseController {
 			instance = this;
 		else
 			Destroy(gameObject);
-		searchButton.onClick.AddListener(queryNewSearch);
+		searchButton.onClick.AddListener(addSearchTag);
+		confirmSearch.onClick.AddListener(queryNewSearch);
 	}
 	//singleton
 	
 	public Button searchButton;
 	public GameObject searchPanel;
 	public InputField searchKeywords;
+	public Text tagArea;
+	public Button confirmSearch;
+
 	public Sprite exitSearch;
 	public Sprite enterSearch;
 
-	LimitedQueue<string> searchTags = new LimitedQueue<string>(10);
+	LimitedQueue<string> searchTags = new LimitedQueue<string>(5);
 
 	public override void enterState(){
 		//do the registration here? on the main controller for current state
@@ -29,6 +33,8 @@ public class searchController : baseController {
 		//open the search panel
 		searchPanel.SetActive(true);
 		searchKeywords.text = "";
+		tagArea.text = "Tell us your favorite movies!";
+		searchTags.Clear();
 		mainController.instance.startNewSearch.image.sprite = exitSearch;
 		//keywords.Clear();
 		
@@ -49,23 +55,41 @@ public class searchController : baseController {
 		//close the search panel 	
 	}
 	
-	//alternative way of submitting search
-	private void OnGUI(){
-		if (Event.current.isKey)
-			if (Event.current.keyCode == KeyCode.Return){
-				developerLogs.log("key board event detected.");
-				queryNewSearch();
-			}
+/// <summary>
+/// return true if there is eviction
+/// </summary>
+/// <returns></returns>
+	void addSearchTag() {
+		string searchContent = searchKeywords.text;
+		searchTags.Enqueue(searchFullName(searchContent));
+		updateTagArea();			
+	}
+
+	void updateTagArea() {
+		//display the search tags in the tag area
+		tagArea.text = "<b>";
+		for (int i = 0; i < searchTags.currentSize(); i++) {
+			string tag = searchTags.Dequeue();
+			tagArea.text += tag + "\n";
+			searchTags.Enqueue(tag);
+		}
+		tagArea.text += "</b>";
 	}
 
 	#region serverCommunication
+	string searchFullName(string inputKeyword) {
+		//ask for auto filling content
+		return inputKeyword;
+	}
+	
 	void queryNewSearch() {
-		string searchContent = searchKeywords.text;
-		developerLogs.log("Query new search with keywords:"+searchContent);
+		string searchContent = tagArea.text.Substring(3,tagArea.text.Length - 7);
+	
+		developerLogs.log("Query new search with keywords:\n"+searchContent);
 		developerLogs.log("refreshing the content:" + searchContent);
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		mainController.instance.recommend.recommendHelper.createTags(10);
+		mainController.instance.recommend.recommendHelper.createTags(5);
 		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
 						  + Input.location.lastData.latitude);
 	}

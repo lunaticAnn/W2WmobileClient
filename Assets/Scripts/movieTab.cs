@@ -42,8 +42,9 @@ public class movieTab : MonoBehaviour {
 		// Start a download of the given URL
 		WWW www = new WWW(url);
 		yield return www;
-		poster.texture = www.texture;
+		poster.texture = www.texture;	
 	}
+	
 
 	void viewDetails() {
 		mainController.instance.details.myInfo = myInfo;
@@ -54,14 +55,14 @@ public class movieTab : MonoBehaviour {
 	void likeThisOne() {
 		if (!infoContainer.instance.inFavorites(myInfo.movie_title)){
 			//add to the list
-			infoContainer.instance.addToMyFav(myInfo);
+			infoContainer.addToMyFav(myInfo);
 			//change sprite to red 
 			developerLogs.log("send with location"+ Input.location.lastData.longitude+
 								","+ Input.location.lastData.latitude);
 			likeButton.image.color = Color.red;
 		}
 		else{
-			infoContainer.instance.removeFromFav(myInfo);
+			infoContainer.removeFromFav(myInfo);
 
 			developerLogs.log("send with location" + Input.location.lastData.longitude +
 											"," + Input.location.lastData.latitude);
@@ -71,9 +72,10 @@ public class movieTab : MonoBehaviour {
 	}
 
 	void deleteThis() {
-		developerLogs.log("send dislike list");
+		
 		developerLogs.log("send with location" + Input.location.lastData.longitude +
 													"," + Input.location.lastData.latitude);
+		infoContainer.addToDislike(myInfo);
 		transform.parent.GetComponent<contentHelper>().removeTab(myIndex);
 	}
 }

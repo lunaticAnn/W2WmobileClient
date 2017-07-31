@@ -6,8 +6,6 @@ using UnityEngine.UI;
 public class mainController : MonoBehaviour {
 
 	public static mainController instance = null;
-	public enum mainState { Recommendations, newSearch, nearbyTrending };
-	public mainState currentState;
 
 	//registration
 	public baseController activeController;
@@ -17,6 +15,7 @@ public class mainController : MonoBehaviour {
 	public recommendController recommend;
 	public locationController location;
 	public detailController details;
+	public userInfoController user;
 
 	#region buttons
 	public Button startNewSearch;
@@ -32,7 +31,6 @@ public class mainController : MonoBehaviour {
 			instance = this;
 		else
 			Destroy(gameObject);
-		currentState = mainState.Recommendations;
 		changeStateTo(recommend);
 	}
  

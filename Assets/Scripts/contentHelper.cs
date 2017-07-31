@@ -38,8 +38,9 @@ public class contentHelper : MonoBehaviour {
 			if (i >= cCount){
 				newTag = Instantiate(tagTemplate);
 				newTag.transform.SetParent(transform);
-				newTag.GetComponent<movieTab>().updateUI(readFromLocal((int)(Random.value * 499f)));
 				newTag.GetComponent<movieTab>().myIndex = i;
+				newTag.GetComponent<movieTab>().updateUI(readFromLocal((int)(Random.value * 499f)));				
+				newTag.name = "tab0";
 				
 			}
 			else {
@@ -78,7 +79,7 @@ public class contentHelper : MonoBehaviour {
 		}
 		Destroy(transform.GetChild(index).gameObject);
 		//update template if it is deleted 
-		if (index == 0) tagTemplate = transform.GetChild(0).gameObject;
+		if (index == 0) tagTemplate = transform.GetChild(1).gameObject;
 		yield return new WaitForEndOfFrame();
 
 		//2s animation?

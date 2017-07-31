@@ -5,7 +5,11 @@ using UnityEngine;
 public class infoContainer : MonoBehaviour {
 	public static infoContainer instance = null;
 	
+	public string userId;
+	
+	//this must be initialized when conneted with server
 	private HashSet<string> favs;
+	private HashSet<string> dislikes;
 
 	void Awake () {
 		if (instance == null)
@@ -14,26 +18,36 @@ public class infoContainer : MonoBehaviour {
 			Destroy(gameObject);
 		DontDestroyOnLoad(gameObject);
 		favs = new HashSet<string>();
+		dislikes = new HashSet<string>();
 	}
 	
 	public bool inFavorites(string target) {
 		return favs.Contains(target);	
 	}
 
-	public void addToMyFav(movieInfo target) {
-		favs.Add(target.movie_title);
+	public static void addToMyFav(movieInfo target) {
+		instance.favs.Add(target.movie_title);
 		developerLogs.log("send to server add target");
 	}
 
-	public void removeFromFav(movieInfo target) {
-		favs.Remove(target.movie_title);
+	public static void removeFromFav(movieInfo target) {
+		instance.favs.Remove(target.movie_title);
 		developerLogs.log("send to server remove target");
 	}
 
-	
-	private void updateHashSet(List<movieInfo> userFavorites) {
-		foreach (movieInfo mi in userFavorites)
-			favs.Add(mi.movie_title);
+	public static void addToDislike(movieInfo target){
+		instance.dislikes.Add(target.movie_title);
+		developerLogs.log("send to server dislike target");
+	}
+
+	public static bool isDislike(movieInfo target){
+		return instance.dislikes.Contains(target.movie_title);		
+	}
+
+
+	private void updateHashSet(HashSet<string> targetList, List<movieInfo> requestList) {
+		foreach (movieInfo mi in requestList)
+			targetList.Add(mi.movie_title);
 	} 
 	
 }

@@ -82,6 +82,7 @@ public class UIcontroller : MonoBehaviour {
 	void confirmLogIn(logInType myType) {
 		string userName = loginUserName.text;
 		string pwd = loginPwd.text;
+		infoContainer.instance.userId = userName;
 		switch (myType) {
 			case logInType.native:
 				if (submitLogIn(userName, pwd) == 2) {
@@ -107,6 +108,7 @@ public class UIcontroller : MonoBehaviour {
 		string userName = signUpUserName.text;
 		string pwd = signUpPwd.text;
 		string name = signUpName.text;
+		infoContainer.instance.userId = name;
 		if (submitSignUp(userName, pwd, name)==2){
 			SceneManager.LoadScene("main");
 		}

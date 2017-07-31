@@ -31,4 +31,8 @@ public class LimitedQueue<T> {
 	public T Dequeue() {
 		return myQueue.Dequeue();
 	}
+
+	public void Clear() {
+		myQueue.Clear();
+	}
 }
