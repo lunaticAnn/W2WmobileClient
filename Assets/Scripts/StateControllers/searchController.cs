@@ -40,11 +40,9 @@ public class searchController : baseController {
 		
 	}
 
-	public override void inputEventHandler()
-	{
+	public override void inputEventHandler(){
 		//get the input event data and parse it to responses
 		
-
 	}
 
 	public override void exitState(){
@@ -90,7 +88,7 @@ public class searchController : baseController {
 		developerLogs.log("refreshing the content:" + searchContent);
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		mainController.instance.recommend.recommendHelper.createTags(5);
+		//mainController.instance.recommend.recommendHelper.createTags(5);
 		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
 						  + Input.location.lastData.latitude);
 	}

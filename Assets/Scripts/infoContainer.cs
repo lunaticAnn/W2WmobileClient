@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class infoContainer : MonoBehaviour {
 	public static infoContainer instance = null;
-	
-	public string userId;
+	public static string server = "http://35.185.195.244/api";
+
+	public string token;
+	public userInfo usrInfo;
+	public List<movieInfo> recommendList;
+
+
+	readonly string[] movieIds = {"597edadaac803f65d2ae51f4", "597edadaac803f65d2ae51f5","597edadaac803f65d2ae51f6", "597edadaac803f65d2ae51f7", "597edadaac803f65d2ae51f8"};
 	
 	//this must be initialized when conneted with server
 	private HashSet<string> favs;
@@ -53,6 +59,56 @@ public class infoContainer : MonoBehaviour {
 	private void updateHashSet(HashSet<string> targetList, List<movieInfo> requestList) {
 		foreach (movieInfo mi in requestList)
 			targetList.Add(mi.movie_title);
-	} 
-	
+	}
+
+	public void updateRecList() {
+		WWWForm form = new WWWForm();
+		for (int i = 0; i < 5; i++) {
+			form.AddField("movieIds", movieIds[i]);
+		}
+		
+		form.AddField("n", 3);
+		form.AddField("longitude", 0);
+		form.AddField("latitude", 0);
+		IEnumerator c = requestRecommendation(form);
+		StartCoroutine(c);
+		
+	}
+
+	IEnumerator requestRecommendation(WWWForm form) {
+		Dictionary<string, string> header = form.headers;
+		header["Authorization"] = "Bearer " + token ;
+		byte[] rawData = form.data;
+		WWW w = new WWW(server + "/users/" + usrInfo.id + "/recommendations", rawData, header);
+		yield return w;
+		if (w.error == ""){
+			recommendation recommendResult = JsonUtility.FromJson<recommendation>(w.text);
+			recommendList =recommendResult.outputMovies ;
+			Debug.Log(w.text);
+			mainController.instance.recommend.recommendHelper.createTags(recommendList.Count, recommendList);
+		}
+		else
+			Debug.LogWarning(w.error);
+	}
+}
+
+[System.Serializable]
+public class userInfo{
+	public string id;
+	public string email;
+	public string name;
+	public string picture;
+}
+
+[System.Serializable]
+public class loginResponse{
+	public string token;
+	public userInfo user;
+}
+
+[System.Serializable]
+public class recommendation {
+	public string id;
+	public List<movieInfo> inputMovies;
+	public List<movieInfo> outputMovies;
 }

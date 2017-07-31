@@ -18,15 +18,12 @@ public class userInfoController : baseController
 	//singleton
 
 	private void Start(){
-		welcome.text = "Welcome, " + infoContainer.instance.userId;
+		welcome.text = "Welcome, " + infoContainer.instance.usrInfo.name;
 	}
 
 	public override void enterState(){
-		//do the registration here? on the main controller for current state
 		base.enterState();
-		//switch to location panel
-		//locationHelper.clearTags();
-		//locationHelper.createTags(10);
+	
 	}
 
 	public override void inputEventHandler(){

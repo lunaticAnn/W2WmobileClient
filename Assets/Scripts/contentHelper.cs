@@ -27,7 +27,7 @@ public class contentHelper : MonoBehaviour {
 		return myInfo;
 	}
 	
-	public void createTags(int num) {
+	public void createTags(int num, List<movieInfo> targetInfo) {
 		if (num == 0) return;
 		//shrink content size
 		int cCount = transform.childCount;
@@ -36,18 +36,18 @@ public class contentHelper : MonoBehaviour {
 		tagTemplate.SetActive(true);
 		tagTemplate.GetComponent<RectTransform>().localPosition =
 		new Vector3(450f, -110f);
-		if(cCount==1)
-			tagTemplate.GetComponent<movieTab>().updateUI(readFromLocal((int)(Random.value * 499f)));
-
+		if (transform.childCount == 1){
+			tagTemplate.GetComponent<movieTab>().updateUI(targetInfo[0]);
+			cCount = 0;
+		}
 		GameObject newTag;
 		for (int i = 1; i < num + cCount; i++){
 			if (i >= cCount){
 				newTag = Instantiate(tagTemplate);
 				newTag.transform.SetParent(transform);
 				newTag.GetComponent<movieTab>().myIndex = i;
-				newTag.GetComponent<movieTab>().updateUI(readFromLocal((int)(Random.value * 499f)));				
-				newTag.name = "tab0";
-				
+				newTag.GetComponent<movieTab>().updateUI(targetInfo[i]);				
+				newTag.name = "tab0";				
 			}
 			else {
 				newTag = transform.GetChild(i).gameObject;
@@ -100,7 +100,7 @@ public class contentHelper : MonoBehaviour {
 		}
 
 		if (transform.childCount < leastChildCount){
-			createTags(1);
+			
 			developerLogs.log("ask for more.");
 		}	
 	}

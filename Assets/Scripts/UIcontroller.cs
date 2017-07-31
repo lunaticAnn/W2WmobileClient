@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class UIcontroller : MonoBehaviour {
 	public GameObject[] StartScreenPanels;
+	
+
+	int serverResponse = 0;
+	bool locker = false; 
+
 	enum logInType { native, google, facebook};
 	logInType currentLogType = logInType.native;
 	/* 0 .startPanel structure:
@@ -50,7 +55,7 @@ public class UIcontroller : MonoBehaviour {
 		logInBack = StartScreenPanels[1].transform.GetChild(3).GetComponent<Button>();
 		signUpBack = StartScreenPanels[2].transform.GetChild(3).GetComponent<Button>();
 		logInSubmission  = StartScreenPanels[1].transform.GetChild(2).GetComponent<Button>();
-		signUpSubmission = StartScreenPanels[2].transform.GetChild(3).GetComponent<Button>();
+		signUpSubmission = StartScreenPanels[2].transform.GetChild(2).GetComponent<Button>();
 
 		clearPanels();
 		ChangePanel(0);
@@ -80,24 +85,19 @@ public class UIcontroller : MonoBehaviour {
 	}
 
 	void confirmLogIn(logInType myType) {
+		if (locker) return;
 		string userName = loginUserName.text;
 		string pwd = loginPwd.text;
-		infoContainer.instance.userId = userName;
+		
 		switch (myType) {
 			case logInType.native:
-				if (submitLogIn(userName, pwd) == 2) {
-					SceneManager.LoadScene("main");
-				}
+				submitLogIn(userName, pwd);					
 				return;
 			case logInType.facebook:
-				if (logInWithFB(userName, pwd) == 2){
-					SceneManager.LoadScene("main");
-				}
+				
 				return;
 			case logInType.google:
-				if (logInWithGoogle(userName, pwd) == 2){
-					SceneManager.LoadScene("main");
-				}
+				
 				return;
 			default:
 				return;
@@ -105,50 +105,74 @@ public class UIcontroller : MonoBehaviour {
 	}
 
 	void confirmSignUp(){
+		if (locker) return;
 		string userName = signUpUserName.text;
 		string pwd = signUpPwd.text;
 		string name = signUpName.text;
-		infoContainer.instance.userId = name;
-		if (submitSignUp(userName, pwd, name)==2){
-			SceneManager.LoadScene("main");
-		}
+		
+		submitSignUp(userName, pwd, name);		
 	}
 
 
 	#region serverComminication
-	int submitLogIn(string uid, string pwd) {		
-		developerLogs.log("login with username and password:" + uid + "," + pwd);
-		developerLogs.log("encoding for password needed");
-		
-		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
-						  +Input.location.lastData.latitude);
-		return 2;
+	void submitLogIn(string uid, string pwd) {		
+
+		WWWForm form = new WWWForm();	
+		form.AddField("email", uid);
+		form.AddField("password",pwd);
+		IEnumerator c = sendForm("/auth/login", form);
+
+		locker = true;
+		StartCoroutine(c);
 	}
 
-	int submitSignUp(string uid, string pwd, string name){
-		developerLogs.log("login with username and password:" + uid + "," + pwd);
-		developerLogs.log("encoding for password needed");
-		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
-						  + Input.location.lastData.latitude);
-		return 2;
+	IEnumerator sendForm(string api, WWWForm myform) {
+		WWW w = new WWW(infoContainer.server+api, myform);		
+		yield return w;
+		if (w.error != ""){
+			Debug.LogWarning(w.error);
+		}
+		else {
+			//load new scene
+			loginResponse lr = JsonUtility.FromJson<loginResponse>(w.text);
+			infoContainer.instance.usrInfo = lr.user;
+			infoContainer.instance.token = lr.token;
+			SceneManager.LoadScene("main");
+		}
+			
+		//unlock 
+		locker = false;
+		Debug.Log(w.text);
 	}
 
-	int logInWithFB(string uid, string pwd) {
-		developerLogs.log("loging with facebook account.." + uid + "," + pwd);
-		developerLogs.log("encoding for password needed");
-		
-		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
-						  + Input.location.lastData.latitude);
-		return 2;
+	void submitSignUp(string uid, string pwd, string name){
+	
+		WWWForm form = new WWWForm();
+
+		form.AddField("email", uid);
+		form.AddField("password", pwd);
+		form.AddField("name", name);
+		IEnumerator c = sendForm("/auth/signup", form);
+		locker = true;
+		StartCoroutine(c);
 	}
 
-	int logInWithGoogle(string uid, string pwd){
-		developerLogs.log("loging with google account.." + uid + "," + pwd);
-		developerLogs.log("encoding for password needed");
+//=======================current unsupported======================
+	void logInWithFB(string uid, string pwd) {
+		//developerLogs.log("loging with facebook account.." + uid + "," + pwd);
+		//developerLogs.log("encoding for password needed");
 		
-		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
-						  + Input.location.lastData.latitude);
-		return 2;
+		//developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+		//				  + Input.location.lastData.latitude);
 	}
+
+	void logInWithGoogle(string uid, string pwd){
+		//developerLogs.log("loging with google account.." + uid + "," + pwd);
+		//developerLogs.log("encoding for password needed");
+		
+		//developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
+		//				  + Input.location.lastData.latitude);
+	}
+	//=======================current unsupported======================
 	#endregion
 }

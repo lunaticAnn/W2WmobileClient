@@ -53,7 +53,8 @@ public class mainController : MonoBehaviour {
 	*/
 	private void Start(){
 		installHandlers();
-		recommend.recommendHelper.createTags(5);
+		infoContainer.instance.updateRecList();
+		//recommend.recommendHelper.createTags(5);
 	}
 
 	void installHandlers() {
@@ -84,4 +85,8 @@ public class mainController : MonoBehaviour {
 			developerLogs.log("Is in search mode, other operations are banned.");
 	}
 
+	#region server connections
+	
+
+	#endregion
 }
