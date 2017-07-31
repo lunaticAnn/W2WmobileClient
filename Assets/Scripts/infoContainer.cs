@@ -21,8 +21,8 @@ public class infoContainer : MonoBehaviour {
 		dislikes = new HashSet<string>();
 	}
 	
-	public bool inFavorites(string target) {
-		return favs.Contains(target);	
+	public static bool inFavorites(string target) {
+		return instance.favs.Contains(target);	
 	}
 
 	public static void addToMyFav(movieInfo target) {
@@ -42,6 +42,11 @@ public class infoContainer : MonoBehaviour {
 
 	public static bool isDislike(movieInfo target){
 		return instance.dislikes.Contains(target.movie_title);		
+	}
+
+	public static void removeFromDislike(movieInfo target) {
+		instance.dislikes.Remove(target.movie_title);
+		developerLogs.log("send to server remove target");
 	}
 
 

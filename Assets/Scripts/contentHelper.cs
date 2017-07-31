@@ -8,11 +8,17 @@ public class contentHelper : MonoBehaviour {
 
 	public GameObject tagTemplate;
 	public int numOfContent;
+	public movieTab toBeRefresh;
 
 	const string cachingPathPrefix = "data_";
 	const float offset = 210f;
 	const int leastChildCount = 5;
 	const int animFrames = 10;
+
+	public void refreshViewedTab() {
+		if (toBeRefresh == null) return;
+		toBeRefresh.processRefresh();
+	}
 
 	movieInfo readFromLocal(int id) {
 		TextAsset jsFile =Resources.Load(cachingPathPrefix+id.ToString()) as TextAsset;
@@ -96,8 +102,7 @@ public class contentHelper : MonoBehaviour {
 		if (transform.childCount < leastChildCount){
 			createTags(1);
 			developerLogs.log("ask for more.");
-		}
-	
+		}	
 	}
 	
 }

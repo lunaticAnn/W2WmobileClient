@@ -62,7 +62,8 @@ public class searchController : baseController {
 	void addSearchTag() {
 		string searchContent = searchKeywords.text;
 		searchTags.Enqueue(searchFullName(searchContent));
-		updateTagArea();			
+		updateTagArea();
+		searchKeywords.text = "";			
 	}
 
 	void updateTagArea() {

@@ -18,12 +18,15 @@ public class recommendController : baseController
 
 	public GameObject recommendField;
 	public contentHelper recommendHelper;
+	//maintain for refreshing status
+	
 
 	public override void enterState()
 	{
 		//do the registration here? on the main controller for current state
 		base.enterState();
 		recommendField.SetActive(true);
+		recommendHelper.refreshViewedTab();
 	}
 
 	public override void inputEventHandler() {
@@ -37,4 +40,6 @@ public class recommendController : baseController
 		base.exitState();
 		recommendField.SetActive(false);
 	}
+
+	
 }

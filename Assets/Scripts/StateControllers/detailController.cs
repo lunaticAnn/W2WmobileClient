@@ -13,9 +13,13 @@ public class detailController : baseController
 			instance = this;
 		else
 			Destroy(gameObject);
+		
+		likeThis.onClick.AddListener(likeThisOne);
+		noInterest.onClick.AddListener(noInterestInThis);
 	}
 	//singleton
 
+	
 	public GameObject detailField;
 	public movieInfo myInfo;
 	public Text descriptions;
@@ -24,6 +28,8 @@ public class detailController : baseController
 	public Image scorePortion;
 	public Text xRates;
 	public Text score;
+	public Button likeThis;
+	public Button noInterest;
 
 	public override void enterState()
 	{
@@ -73,6 +79,10 @@ public class detailController : baseController
 		scorePortion.fillAmount = 0f;
 		xRates.text = myInfo.num_voted_users.ToString() + " <color=#515151ff>Rates</color>";
 		IEnumerator c = updatePoster(myInfo.image_url);
+
+		likeThis.image.color = infoContainer.inFavorites(myInfo.movie_title) ? Color.red : Color.gray;
+		noInterest.image.color = infoContainer.isDislike(myInfo) ? Color.black : Color.grey;
+
 		StartCoroutine(c);
 		StartCoroutine("updateScoreBar");
 	}
@@ -93,5 +103,42 @@ public class detailController : baseController
 			yield return new WaitForEndOfFrame();
 		}
 
+	}
+
+	void likeThisOne(){
+		if (!infoContainer.inFavorites(myInfo.movie_title))
+		{
+			//add to the list
+			infoContainer.addToMyFav(myInfo);
+			//change sprite to red 
+			developerLogs.log("send with location" + Input.location.lastData.longitude +
+								"," + Input.location.lastData.latitude);
+			likeThis.image.color = Color.red;
+		}
+		else{
+			infoContainer.removeFromFav(myInfo);
+			developerLogs.log("send with location" + Input.location.lastData.longitude +
+											"," + Input.location.lastData.latitude);
+			//change the sprite back to grey
+			likeThis.image.color = Color.grey;
+		}
+	}
+
+	void noInterestInThis(){
+		if (!infoContainer.isDislike(myInfo)){
+			//add to the list
+			infoContainer.addToDislike(myInfo);
+			//change sprite to red 
+			developerLogs.log("send with location" + Input.location.lastData.longitude +
+								"," + Input.location.lastData.latitude);
+			noInterest.image.color = Color.black;
+		}
+		else{
+			infoContainer.removeFromDislike(myInfo);
+			developerLogs.log("send with location" + Input.location.lastData.longitude +
+											"," + Input.location.lastData.latitude);
+			//change the sprite back to grey
+			noInterest.image.color = Color.grey;
+		}
 	}
 }

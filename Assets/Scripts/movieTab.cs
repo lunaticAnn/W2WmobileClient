@@ -16,6 +16,18 @@ public class movieTab : MonoBehaviour {
 	//to help adjust margin when remove
 	public int myIndex;
 
+	public void processRefresh(){
+		if (infoContainer.isDislike(myInfo)) {
+			deleteThis();
+			return;
+		}
+		if (infoContainer.inFavorites(myInfo.movie_title))
+			likeButton.image.color = Color.red;
+		else
+			likeButton.image.color = Color.grey;
+	}
+
+
 	public void updateUI(movieInfo m){
 		myInfo = m;
 		string tmp = "";
@@ -24,7 +36,7 @@ public class movieTab : MonoBehaviour {
 		tmp +=  m.title_year;
 		movieDetails.text = tmp;
 
-		if (infoContainer.instance.inFavorites(myInfo.movie_title))
+		if (infoContainer.inFavorites(myInfo.movie_title))
 			likeButton.image.color = Color.red;
 		else
 			likeButton.image.color = Color.grey;
@@ -44,16 +56,17 @@ public class movieTab : MonoBehaviour {
 		yield return www;
 		poster.texture = www.texture;	
 	}
-	
 
 	void viewDetails() {
+		//set myself to the toBeRefresh
+		transform.parent.GetComponent<contentHelper>().toBeRefresh = this;	
 		mainController.instance.details.myInfo = myInfo;
 		mainController.instance.changeStateTo(mainController.instance.details, 
 		mainController.instance.activeController);		
 	}
 
 	void likeThisOne() {
-		if (!infoContainer.instance.inFavorites(myInfo.movie_title)){
+		if (!infoContainer.inFavorites(myInfo.movie_title)){
 			//add to the list
 			infoContainer.addToMyFav(myInfo);
 			//change sprite to red 
@@ -78,4 +91,5 @@ public class movieTab : MonoBehaviour {
 		infoContainer.addToDislike(myInfo);
 		transform.parent.GetComponent<contentHelper>().removeTab(myIndex);
 	}
+
 }
