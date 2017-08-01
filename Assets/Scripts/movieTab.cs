@@ -73,25 +73,17 @@ public class movieTab : MonoBehaviour {
 		if (!infoContainer.inFavorites(myInfo)){
 			//add to the list
 			infoContainer.addToMyFav(myInfo);
-			//change sprite to red 
-			developerLogs.log("send with location"+ Input.location.lastData.longitude+
-								","+ Input.location.lastData.latitude);
+			//change sprite to red 			
 			likeButton.image.color = Color.red;
 		}
 		else{
 			infoContainer.removeFromFav(myInfo);
-
-			developerLogs.log("send with location" + Input.location.lastData.longitude +
-											"," + Input.location.lastData.latitude);
 			//change the sprite back to grey
 			likeButton.image.color = Color.grey;
 		}
 	}
 
 	void deleteThis() {
-		
-		developerLogs.log("send with location" + Input.location.lastData.longitude +
-													"," + Input.location.lastData.latitude);
 		infoContainer.addToDislike(myInfo);
 		transform.parent.GetComponent<contentHelper>().removeTab(myIndex);
 	}

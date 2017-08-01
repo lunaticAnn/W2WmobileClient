@@ -10,7 +10,6 @@ public class contentHelper : MonoBehaviour {
 	public int numOfContent;
 	public movieTab toBeRefresh;
 
-	const string cachingPathPrefix = "data_";
 	const float offset = 210f;
 	const int leastChildCount = 5;
 	const int animFrames = 10;
@@ -21,13 +20,14 @@ public class contentHelper : MonoBehaviour {
 	}
 
 	movieInfo readFromLocal(int id) {
-		TextAsset jsFile =Resources.Load(cachingPathPrefix+id.ToString()) as TextAsset;
+		TextAsset jsFile =Resources.Load(id.ToString()) as TextAsset;
 		string jsStr = jsFile.text;
 		movieInfo myInfo = JsonUtility.FromJson<movieInfo>(jsStr);
 		return myInfo;
 	}
 	
 	public void createTags(int num, List<movieInfo> targetInfo) {
+		//Debug.Log("get create tag request, for :" + num);
 		if (num == 0) return;
 		//shrink content size
 		int cCount = transform.childCount;
@@ -41,6 +41,7 @@ public class contentHelper : MonoBehaviour {
 			tagTemplate.GetComponent<movieTab>().updateUI(targetInfo[0]);
 			cCount = 0;
 		}
+
 		GameObject newTag;
 		for (int i = 1; i < num + cCount; i++){
 			if (i >= cCount){
@@ -112,7 +113,7 @@ public class contentHelper : MonoBehaviour {
 
 		if (transform.childCount < leastChildCount){
 			
-			developerLogs.log("ask for more.");
+			//developerLogs.log("ask for more.");
 		}	
 	}
 	

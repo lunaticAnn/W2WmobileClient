@@ -32,6 +32,9 @@ public class mainController : MonoBehaviour {
 		else
 			Destroy(gameObject);
 		changeStateTo(recommend);
+
+		//initialize recommendation field
+		infoContainer.instance.sendSearchQuery("", 5, 1);
 	}
  
 	public bool changeStateTo(baseController toActivate, baseController from = null) {

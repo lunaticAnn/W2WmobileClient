@@ -81,13 +81,15 @@ public class searchController : baseController {
 	}
 	
 	void queryNewSearch() {
-		string searchContent = tagArea.text.Substring(3,tagArea.text.Length - 5);
-	
-		developerLogs.log("Query new search with keywords:\n"+searchContent);
+		//send searching query
+		infoContainer.instance.updateRecList(searchTags);
 
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		mainController.instance.recommend.recommendHelper.clearTags();		
+		mainController.instance.recommend.recommendHelper.clearTags();
+		
+		//================== testing like / dislike ============================
+		mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);	
 	}
 	#endregion
 }

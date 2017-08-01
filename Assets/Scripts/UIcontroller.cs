@@ -70,6 +70,8 @@ public class UIcontroller : MonoBehaviour {
 		logInBack.onClick.AddListener(delegate { ChangePanel(0); });
 		logInSubmission.onClick.AddListener(delegate { confirmLogIn(logInType.native); });
 		signUpSubmission.onClick.AddListener(confirmSignUp);
+
+		submitLogIn("a@b.com", "11111111");
 		
 		Input.location.Start();
 	}

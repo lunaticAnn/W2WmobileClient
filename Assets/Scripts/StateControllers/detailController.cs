@@ -111,14 +111,10 @@ public class detailController : baseController
 			//add to the list
 			infoContainer.addToMyFav(myInfo);
 			//change sprite to red 
-			developerLogs.log("send with location" + Input.location.lastData.longitude +
-								"," + Input.location.lastData.latitude);
 			likeThis.image.color = Color.red;
 		}
 		else{
 			infoContainer.removeFromFav(myInfo);
-			developerLogs.log("send with location" + Input.location.lastData.longitude +
-											"," + Input.location.lastData.latitude);
 			//change the sprite back to grey
 			likeThis.image.color = Color.grey;
 		}
@@ -129,14 +125,10 @@ public class detailController : baseController
 			//add to the list
 			infoContainer.addToDislike(myInfo);
 			//change sprite to red 
-			developerLogs.log("send with location" + Input.location.lastData.longitude +
-								"," + Input.location.lastData.latitude);
 			noInterest.image.color = Color.black;
 		}
 		else{
 			infoContainer.removeFromDislike(myInfo);
-			developerLogs.log("send with location" + Input.location.lastData.longitude +
-											"," + Input.location.lastData.latitude);
 			//change the sprite back to grey
 			noInterest.image.color = Color.grey;
 		}

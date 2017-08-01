@@ -23,10 +23,10 @@ public class locationController : baseController
 		//do the registration here? on the main controller for current state
 		base.enterState();
 		//switch to location panel
-		locationField.SetActive(true); 
-	
-		//locationHelper.clearTags();
-		//locationHelper.createTags(10);
+		locationField.SetActive(true);
+		locationHelper.clearTags();
+		infoContainer.instance.getNearbyTrending(1f);
+		
 	}
 
 	public override void inputEventHandler(){

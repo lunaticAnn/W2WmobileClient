@@ -32,17 +32,20 @@ public class infoContainer : MonoBehaviour {
 
 	public static void addToMyFav(movieInfo target) {
 		instance.favs.Add(target.id);
-		developerLogs.log("send to server add target");
+		instance.modifyTargetList(target, "add", "liked");
+		//developerLogs.log("send to server add target");
 	}
 
 	public static void removeFromFav(movieInfo target) {
 		instance.favs.Remove(target.id);
-		developerLogs.log("send to server remove target");
+		instance.modifyTargetList(target, "remove", "liked");
+		//developerLogs.log("send to server remove target");
 	}
 
 	public static void addToDislike(movieInfo target){
 		instance.dislikes.Add(target.id);
-		developerLogs.log("send to server dislike target");
+		instance.modifyTargetList(target, "add", "disliked");
+		//developerLogs.log("send to server dislike target");
 	}
 
 	public static bool isDislike(movieInfo target){
@@ -50,8 +53,9 @@ public class infoContainer : MonoBehaviour {
 	}
 
 	public static void removeFromDislike(movieInfo target) {
+		instance.modifyTargetList(target, "remove", "disliked");
 		instance.dislikes.Remove(target.id);
-		developerLogs.log("send to server remove target");
+		//developerLogs.log("send to server remove target");
 	}
 	#endregion
 
@@ -65,10 +69,11 @@ public class infoContainer : MonoBehaviour {
 			targetList.Add(mi.id);
 	}
 
-	public void updateRecList(List<movieInfo> movieIds, int n = 5) {
+	#region update recommendation list
+	public void updateRecList(List<movieInfo> movieInfos, int n = 5) {
 		WWWForm form = new WWWForm();
-		for (int i = 0; i < movieIds.Count; i++) {
-			form.AddField("movieIds", movieIds[i].id);
+		for (int i = 0; i < movieInfos.Count; i++) {
+			form.AddField("movieIds", movieInfos[i].id);
 		}
 		
 		form.AddField("n", n);
@@ -93,27 +98,40 @@ public class infoContainer : MonoBehaviour {
 		else
 			Debug.LogWarning(w.error);
 	}
+	#endregion
 
-	public void sendSearchQuery(string s, int n){
-		IEnumerator c = searchMoviesByTitle(s, n);
+	#region send search query
+	//wrapper function 
+	public void sendSearchQuery(string s, int n, int i = 0){
+		IEnumerator c = searchMoviesByTitle(s, n, i);
 		StartCoroutine(c);
 	}
 
-	IEnumerator searchMoviesByTitle(string s, int n){
+	IEnumerator searchMoviesByTitle(string s, int n, int i){
 		Dictionary<string, string> header = new Dictionary<string, string>();
 		header["Authorization"] = "Bearer " + token;
 		
-		WWW w = new WWW(server + parseSearchQuery(s,n), null, header);
+		WWW w = new WWW(server + parseSearchQuery(s,n,i), null, header);
 		yield return w;
 		if (w.error == ""){
 			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":"+w.text+"}");
 			searchResult = result.myList;
-			searchController.instance.searchBar.updateBarContent(searchResult);
+			if (i != 1)
+				searchController.instance.searchBar.updateBarContent(searchResult);
+			else
+				recommendController.instance.recommendHelper.createTags(searchResult.Count, searchResult);
 		}
 		else
 			Debug.LogWarning(w.error);
 	}
 
+	string parseSearchQuery(string s, int n, int i){
+		if(i == 1) return "/movies?q=" + s + "&n=" + n.ToString()+"&i="+i.ToString(); 
+		return "/movies?q=" + s + "&n=" + n.ToString();
+	}
+	#endregion
+
+	#region sync user list 
 	//wrapper function
 	void updateLocalList(string listName, HashSet<string> targetList) {
 		IEnumerator c = updateMovieList(listName, targetList);
@@ -129,7 +147,7 @@ public class infoContainer : MonoBehaviour {
 		yield return w;
 
 		if (w.error == ""){
-			Debug.Log(w.text);
+			//Debug.Log(w.text);
 			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":" + w.text + "}");
 			updateHashSet(targetList, result.myList);
 		}
@@ -137,13 +155,75 @@ public class infoContainer : MonoBehaviour {
 			Debug.LogWarning(w.error);
 	}
 
-	string parseSearchQuery(string s, int n) {
-		return "/movies?q=" + s + "&n=" + n.ToString();
-	}
 
 	string parseListUpdateQuery(string listName){
 		return "/users/"+ usrInfo.id + "/movies/"+listName;
 	}
+	#endregion
+
+	#region send like/dislike data
+	//wrapper functions
+	public void modifyTargetList(movieInfo m,string action, string targetList) {
+		WWWForm form = new WWWForm();
+		//movieId, action, longitude, latitude
+		form.AddField("movieId", m.id);
+		form.AddField("action", action);
+		form.AddField("longitude", Input.location.lastData.longitude.ToString());
+		form.AddField("latitude", Input.location.lastData.altitude.ToString());
+		IEnumerator c = modifyList(form, targetList);
+		StartCoroutine(c);
+	}
+
+	IEnumerator modifyList(WWWForm form, string targetList){
+		Dictionary<string, string> header = form.headers;
+		header["Authorization"] = "Bearer " + token;
+		byte[] rawData = form.data;
+		WWW w = new WWW(server + parseListUpdateQuery(targetList), rawData, header);
+		yield return w;
+
+		if (w.error != "")	
+			Debug.LogWarning(w.error);
+	}
+	#endregion
+
+	#region get nearby trending
+	public void getNearbyTrending(float distance, int n = 5){
+		IEnumerator c = getNearby(distance, n);
+		StartCoroutine(c);
+	}
+
+	IEnumerator getNearby(float distance, int n) {
+		Dictionary<string, string> header = new Dictionary<string, string>();
+		header["Authorization"] = "Bearer " + token;
+
+		WWW w = new WWW(server + parseNearby(distance,n), null, header);
+		yield return w;
+		if (w.error == ""){
+			//Debug.Log(w.text);
+			List<movieWithCount> result = JsonUtility.FromJson<nearByReponse>(w.text).topLikedMovies;
+			Debug.Log("result:" + result.Count);
+			List<movieInfo> res = new List<movieInfo>();
+			for (int i = 0; i < result.Count; i++) {
+				res.Add(result[i].movie);
+			}
+			locationController.instance.locationHelper.createTags(res.Count, res);
+		}
+		else
+			Debug.LogWarning(w.error);
+	}
+
+	string parseNearby(float distance, int n) {
+		//long, lat, dist, n
+		string tmp = "/nearby?long=";
+		tmp += Input.location.lastData.longitude.ToString();
+		tmp += "&lat=" + Input.location.lastData.latitude.ToString();
+		tmp += "&dist=" + distance.ToString();
+		tmp += "&n=" + n.ToString();
+		return tmp;
+	}
+
+	#endregion
+
 }
 
 [System.Serializable]
@@ -170,4 +250,17 @@ public class recommendation {
 [System.Serializable]
 public class movieList {
 	public List<movieInfo> myList;
+}
+
+//{topLikedMovies: [{movie, count}], topSeenMovies: [{movie, count}]}
+[System.Serializable]
+public class nearByReponse {
+	public List<movieWithCount> topLikedMovies;
+	public List<movieWithCount> topSeenMovies;
+}
+
+[System.Serializable]
+public class movieWithCount {
+	public movieInfo movie;
+	public int count;
 }
