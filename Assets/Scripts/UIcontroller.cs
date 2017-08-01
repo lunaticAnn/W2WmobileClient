@@ -69,7 +69,7 @@ public class UIcontroller : MonoBehaviour {
 		logInSubmission.onClick.AddListener(delegate { confirmLogIn(logInType.native); });
 		signUpSubmission.onClick.AddListener(confirmSignUp);
 
-		//submitLogIn("a@b.com", "11111111");
+		submitLogIn("a@b.com", "11111111");
 		errorMessage.text = "";
 		Input.location.Start();
 	}
@@ -147,8 +147,18 @@ public class UIcontroller : MonoBehaviour {
 	}
 
 	IEnumerator sendForm(string api, WWWForm myform) {
-		WWW w = new WWW(infoContainer.server+api, myform);		
-		yield return w;
+			#if UNITY_WEBGL
+			Dictionary<string, string> header = myform.headers;
+			header["Access-Control-Allow-Credentials"]="true";
+			header["Access-Control-Allow-Headers"]= "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time";
+			header["Access-Control-Allow-Methods"]= "GET, POST, OPTIONS";
+			header["Access-Control-Allow-Origin"]= "*";
+			byte[] rawData = myform.data;
+			WWW w = new WWW(infoContainer.server+api, rawData, header);
+			#else
+			WWW w = new WWW(infoContainer.server+api, myform);
+			#endif		
+			yield return w;
 		if (w.error != ""){
 			errorMessage.text = parseError(w.text);
 			Debug.LogWarning(w.error);

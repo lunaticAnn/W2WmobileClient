@@ -15,6 +15,8 @@ public class infoContainer : MonoBehaviour {
 	private HashSet<string> favs;
 	private HashSet<string> dislikes;
 
+	List<movieInfo> localLikeList;
+
 	void Awake () {
 		if (instance == null)
 			instance = this;
@@ -111,7 +113,7 @@ public class infoContainer : MonoBehaviour {
 	IEnumerator searchMoviesByTitle(string s, int n, int i){
 		Dictionary<string, string> header = new Dictionary<string, string>();
 		header["Authorization"] = "Bearer " + token;
-		
+
 		WWW w = new WWW(server + parseSearchQuery(s,n,i), null, header);
 		yield return w;
 		if (w.error == ""){
@@ -151,6 +153,8 @@ public class infoContainer : MonoBehaviour {
 			//Debug.Log(w.text);
 			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":" + w.text + "}");
 			updateHashSet(targetList, result.myList);
+			
+			
 		}
 		else
 			Debug.LogWarning(w.error);
@@ -189,6 +193,7 @@ public class infoContainer : MonoBehaviour {
 
 	#region get nearby trending
 	public void getNearbyTrending(float distance, int n = 5){
+		mainController.instance.location.locationHelper.clearTags();
 		IEnumerator c = getNearby(distance, n);
 		StartCoroutine(c);
 	}

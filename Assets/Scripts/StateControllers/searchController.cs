@@ -22,8 +22,9 @@ public class searchController : baseController {
 	public Button searchButton;
 	public GameObject searchPanel;
 	public InputField searchKeywords;
-	public Text tagArea;
 	public Button confirmSearch;
+	public GameObject searchTab;
+	public Transform tabPanel;
 
 	public Sprite exitSearch;
 	public Sprite enterSearch;
@@ -36,8 +37,8 @@ public class searchController : baseController {
 		//open the search panel
 		searchPanel.SetActive(true);
 		searchKeywords.text = "";
-		tagArea.text = "Tell us your favorite movies!";
 		searchTags.Clear();
+		clearSearchPanel();
 		mainController.instance.startNewSearch.image.sprite = exitSearch;
 		searchBar.updateBarContent(new List<movieInfo>());
 	}
@@ -60,19 +61,35 @@ public class searchController : baseController {
 /// </summary>
 /// <returns></returns>
 	public void addSearchTag(movieInfo m) {
+		//update the search tag list
+		GameObject s = Instantiate(searchTab);
+		s.transform.SetParent(tabPanel, false);
+		RectTransform r = searchTab.GetComponent<RectTransform>();
+		r.localScale = Vector3.one;
+		s.GetComponent<Button>().onClick.AddListener(delegate { removeFromTags(m ,s); });
+		s.GetComponentInChildren<Text>().text = m.movie_title;
 		searchTags.Add(m);
 		updateTagArea();
 		searchKeywords.text = "";			
 	}
 
 	void updateTagArea() {
-		//display the search tags in the tag area
-		tagArea.text = "<b>";
+		//display the search tags in the tag area				
 		for (int i = 0; i < searchTags.Count; i++) {
-			string tag = searchTags[i].movie_title;
-			tagArea.text += tag + ";  ";
+			tabPanel.GetChild(i).GetComponent<RectTransform>().localPosition =
+			new Vector3(0f, 180f - 50 * i);
 		}
-		tagArea.text += "</b>";
+		
+	}
+
+	void clearSearchPanel() {
+		for (int i = 0; i < tabPanel.childCount; i++)
+			Destroy(tabPanel.GetChild(i).gameObject);
+	}
+
+	void removeFromTags(movieInfo m, GameObject s) {
+		searchTags.Remove(m);
+		Destroy(s);
 	}
 
 	#region serverCommunication
@@ -83,13 +100,12 @@ public class searchController : baseController {
 	void queryNewSearch() {
 		//send searching query
 		StartCoroutine("newSearch");		
-		//================== testing like / dislike ============================
-		
+		//================== testing like / dislike ============================	
 	}
 
 	IEnumerator newSearch() { 
 		yield return mainController.instance.recommend.recommendHelper.clearTags();
-		infoContainer.instance.updateRecList(searchTags,20);
+		infoContainer.instance.updateRecList(searchTags,10);
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
 		Debug.Log("creating search tags:" + searchTags.Count);

@@ -35,6 +35,7 @@ public class mainController : MonoBehaviour {
 
 		//initialize recommendation field
 		infoContainer.instance.sendSearchQuery("", 5, 1);
+		
 	}
  
 	public bool changeStateTo(baseController toActivate, baseController from = null) {
