@@ -6,13 +6,16 @@ using UnityEngine.UI;
 public class searchController : baseController {
 	//singleton
 	public static searchController instance = null;
+	public searchBarContent searchBar;
+
 	private void Awake(){
 		if (instance == null)
 			instance = this;
 		else
 			Destroy(gameObject);
-		searchButton.onClick.AddListener(addSearchTag);
+		//searchButton.onClick.AddListener(addSearchTag);
 		confirmSearch.onClick.AddListener(queryNewSearch);
+		searchKeywords.onValueChanged.AddListener(searchFullName);
 	}
 	//singleton
 	
@@ -36,8 +39,7 @@ public class searchController : baseController {
 		tagArea.text = "Tell us your favorite movies!";
 		searchTags.Clear();
 		mainController.instance.startNewSearch.image.sprite = exitSearch;
-		//keywords.Clear();
-		
+		searchBar.updateBarContent(new List<movieInfo>());
 	}
 
 	public override void inputEventHandler(){
@@ -57,9 +59,8 @@ public class searchController : baseController {
 /// return true if there is eviction
 /// </summary>
 /// <returns></returns>
-	void addSearchTag() {
-		string searchContent = searchKeywords.text;
-		searchTags.Enqueue(searchFullName(searchContent));
+	public void addSearchTag(movieInfo m) {
+		searchTags.Enqueue(m.movie_title);
 		updateTagArea();
 		searchKeywords.text = "";			
 	}
@@ -76,9 +77,8 @@ public class searchController : baseController {
 	}
 
 	#region serverCommunication
-	string searchFullName(string inputKeyword) {
-		//ask for auto filling content
-		return inputKeyword;
+	void searchFullName(string inputKeyword) {
+		infoContainer.instance.sendSearchQuery(inputKeyword, 5);		
 	}
 	
 	void queryNewSearch() {

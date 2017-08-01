@@ -36,6 +36,7 @@ public class contentHelper : MonoBehaviour {
 		tagTemplate.SetActive(true);
 		tagTemplate.GetComponent<RectTransform>().localPosition =
 		new Vector3(450f, -110f);
+		
 		if (transform.childCount == 1){
 			tagTemplate.GetComponent<movieTab>().updateUI(targetInfo[0]);
 			cCount = 0;
@@ -79,6 +80,16 @@ public class contentHelper : MonoBehaviour {
 	}
 
 	IEnumerator removeAnimation(int index) {
+		//if there is only one tab, set it inactive?
+		if (index >= transform.childCount) {
+			yield break;
+		}
+
+		if (transform.childCount == 1 && index == 0){
+			//set inactive
+			transform.GetChild(0).gameObject.SetActive(false);
+			yield break;
+		}
 		//update index of following tabs;
 		for (int i = index + 1; i < transform.childCount; i++) {
 			transform.GetChild(i).GetComponent<movieTab>().myIndex--;

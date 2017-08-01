@@ -9,10 +9,9 @@ public class infoContainer : MonoBehaviour {
 	public string token;
 	public userInfo usrInfo;
 	public List<movieInfo> recommendList;
+	public List<movieInfo> searchResult;
 
-
-	readonly string[] movieIds = {"597edadaac803f65d2ae51f4", "597edadaac803f65d2ae51f5","597edadaac803f65d2ae51f6", "597edadaac803f65d2ae51f7", "597edadaac803f65d2ae51f8"};
-	
+	public List<string> movieIds;
 	//this must be initialized when conneted with server
 	private HashSet<string> favs;
 	private HashSet<string> dislikes;
@@ -25,6 +24,7 @@ public class infoContainer : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 		favs = new HashSet<string>();
 		dislikes = new HashSet<string>();
+		movieIds = new List<string>();
 	}
 	
 	public static bool inFavorites(string target) {
@@ -63,7 +63,7 @@ public class infoContainer : MonoBehaviour {
 
 	public void updateRecList() {
 		WWWForm form = new WWWForm();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < movieIds.Count; i++) {
 			form.AddField("movieIds", movieIds[i]);
 		}
 		
@@ -71,8 +71,7 @@ public class infoContainer : MonoBehaviour {
 		form.AddField("longitude", 0);
 		form.AddField("latitude", 0);
 		IEnumerator c = requestRecommendation(form);
-		StartCoroutine(c);
-		
+		StartCoroutine(c);		
 	}
 
 	IEnumerator requestRecommendation(WWWForm form) {
@@ -83,12 +82,37 @@ public class infoContainer : MonoBehaviour {
 		yield return w;
 		if (w.error == ""){
 			recommendation recommendResult = JsonUtility.FromJson<recommendation>(w.text);
-			recommendList =recommendResult.outputMovies ;
+			recommendList =recommendResult.outputMovies;
 			Debug.Log(w.text);
 			mainController.instance.recommend.recommendHelper.createTags(recommendList.Count, recommendList);
 		}
 		else
 			Debug.LogWarning(w.error);
+	}
+
+	public void sendSearchQuery(string s, int n){
+		IEnumerator c = searchMoviesByTitle(s, n);
+		StartCoroutine(c);
+	}
+
+	IEnumerator searchMoviesByTitle(string s, int n){
+		Dictionary<string, string> header = new Dictionary<string, string>();
+		header["Authorization"] = "Bearer " + token;
+		
+		WWW w = new WWW(server + parseSearchQuery(s,n), null, header);
+		yield return w;
+		if (w.error == ""){
+			Debug.Log(w.text);
+			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":"+w.text+"}");
+			searchResult = result.myList;
+			searchController.instance.searchBar.updateBarContent(searchResult);
+		}
+		else
+			Debug.LogWarning(w.error);
+	}
+
+	string parseSearchQuery(string s, int n) {
+		return "/movies?q=" + s + "&n=" + n.ToString();
 	}
 }
 
@@ -111,4 +135,9 @@ public class recommendation {
 	public string id;
 	public List<movieInfo> inputMovies;
 	public List<movieInfo> outputMovies;
+}
+
+[System.Serializable]
+public class movieList {
+	public List<movieInfo> myList;
 }

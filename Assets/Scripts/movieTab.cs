@@ -44,8 +44,12 @@ public class movieTab : MonoBehaviour {
 		// update listener for the current button
 		GetComponent<Button>().onClick.RemoveAllListeners();
 		GetComponent<Button>().onClick.AddListener(viewDetails);
+		likeButton.onClick.RemoveAllListeners();
 		likeButton.onClick.AddListener(likeThisOne);
+		deleteThisTab.onClick.RemoveAllListeners();
 		deleteThisTab.onClick.AddListener(deleteThis);
+		
+		//update the poster
 		IEnumerator c = updatePoster(m.image_url);
 		StartCoroutine(c);
 	}

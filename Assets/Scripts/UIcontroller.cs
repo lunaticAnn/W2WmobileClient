@@ -41,6 +41,9 @@ public class UIcontroller : MonoBehaviour {
 	public InputField signUpUserName;
 	public InputField signUpPwd;
 	public InputField signUpName;
+	public Text signUpParsed;
+
+	public string myPassword;
 
 	Button signUp;
 	Button signUpBack;
@@ -56,6 +59,8 @@ public class UIcontroller : MonoBehaviour {
 		signUpBack = StartScreenPanels[2].transform.GetChild(3).GetComponent<Button>();
 		logInSubmission  = StartScreenPanels[1].transform.GetChild(2).GetComponent<Button>();
 		signUpSubmission = StartScreenPanels[2].transform.GetChild(2).GetComponent<Button>();
+		//signUpPwd.textComponent.color = new Color(0, 0, 0, 0);
+		//signUpPwd.onValueChanged.AddListener(updateParsed);
 
 		clearPanels();
 		ChangePanel(0);
@@ -93,15 +98,19 @@ public class UIcontroller : MonoBehaviour {
 			case logInType.native:
 				submitLogIn(userName, pwd);					
 				return;
-			case logInType.facebook:
-				
+			case logInType.facebook:				
 				return;
-			case logInType.google:
-				
+			case logInType.google:				
 				return;
 			default:
 				return;
 		}
+	}
+
+	void updateParsed(string s) {
+		signUpParsed.text="";
+		for (int i = 0; i < s.Length; i++)
+			signUpPwd.text += "*";
 	}
 
 	void confirmSignUp(){
