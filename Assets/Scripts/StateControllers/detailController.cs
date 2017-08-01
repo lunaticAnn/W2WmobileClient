@@ -80,7 +80,7 @@ public class detailController : baseController
 		xRates.text = myInfo.num_voted_users.ToString() + " <color=#515151ff>Rates</color>";
 		IEnumerator c = updatePoster(myInfo.image_url);
 
-		likeThis.image.color = infoContainer.inFavorites(myInfo.movie_title) ? Color.red : Color.gray;
+		likeThis.image.color = infoContainer.inFavorites(myInfo) ? Color.red : Color.gray;
 		noInterest.image.color = infoContainer.isDislike(myInfo) ? Color.black : Color.grey;
 
 		StartCoroutine(c);
@@ -106,7 +106,7 @@ public class detailController : baseController
 	}
 
 	void likeThisOne(){
-		if (!infoContainer.inFavorites(myInfo.movie_title))
+		if (!infoContainer.inFavorites(myInfo))
 		{
 			//add to the list
 			infoContainer.addToMyFav(myInfo);

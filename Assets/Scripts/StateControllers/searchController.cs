@@ -28,7 +28,7 @@ public class searchController : baseController {
 	public Sprite exitSearch;
 	public Sprite enterSearch;
 
-	LimitedQueue<string> searchTags = new LimitedQueue<string>(5);
+	List<movieInfo> searchTags = new List<movieInfo>();
 
 	public override void enterState(){
 		//do the registration here? on the main controller for current state
@@ -60,7 +60,7 @@ public class searchController : baseController {
 /// </summary>
 /// <returns></returns>
 	public void addSearchTag(movieInfo m) {
-		searchTags.Enqueue(m.movie_title);
+		searchTags.Add(m);
 		updateTagArea();
 		searchKeywords.text = "";			
 	}
@@ -68,10 +68,9 @@ public class searchController : baseController {
 	void updateTagArea() {
 		//display the search tags in the tag area
 		tagArea.text = "<b>";
-		for (int i = 0; i < searchTags.currentSize(); i++) {
-			string tag = searchTags.Dequeue();
-			tagArea.text += tag + "\n";
-			searchTags.Enqueue(tag);
+		for (int i = 0; i < searchTags.Count; i++) {
+			string tag = searchTags[i].movie_title;
+			tagArea.text += tag + ";  ";
 		}
 		tagArea.text += "</b>";
 	}
@@ -82,15 +81,13 @@ public class searchController : baseController {
 	}
 	
 	void queryNewSearch() {
-		string searchContent = tagArea.text.Substring(3,tagArea.text.Length - 7);
+		string searchContent = tagArea.text.Substring(3,tagArea.text.Length - 5);
 	
 		developerLogs.log("Query new search with keywords:\n"+searchContent);
-		developerLogs.log("refreshing the content:" + searchContent);
+
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		//mainController.instance.recommend.recommendHelper.createTags(5);
-		developerLogs.log("sending input location:" + Input.location.lastData.longitude + ","
-						  + Input.location.lastData.latitude);
+		mainController.instance.recommend.recommendHelper.clearTags();		
 	}
 	#endregion
 }

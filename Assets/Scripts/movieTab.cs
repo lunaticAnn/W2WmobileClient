@@ -21,7 +21,7 @@ public class movieTab : MonoBehaviour {
 			deleteThis();
 			return;
 		}
-		if (infoContainer.inFavorites(myInfo.movie_title))
+		if (infoContainer.inFavorites(myInfo))
 			likeButton.image.color = Color.red;
 		else
 			likeButton.image.color = Color.grey;
@@ -36,7 +36,7 @@ public class movieTab : MonoBehaviour {
 		tmp +=  m.title_year;
 		movieDetails.text = tmp;
 
-		if (infoContainer.inFavorites(myInfo.movie_title))
+		if (infoContainer.inFavorites(myInfo))
 			likeButton.image.color = Color.red;
 		else
 			likeButton.image.color = Color.grey;
@@ -70,7 +70,7 @@ public class movieTab : MonoBehaviour {
 	}
 
 	void likeThisOne() {
-		if (!infoContainer.inFavorites(myInfo.movie_title)){
+		if (!infoContainer.inFavorites(myInfo)){
 			//add to the list
 			infoContainer.addToMyFav(myInfo);
 			//change sprite to red 

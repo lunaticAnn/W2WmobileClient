@@ -11,7 +11,6 @@ public class infoContainer : MonoBehaviour {
 	public List<movieInfo> recommendList;
 	public List<movieInfo> searchResult;
 
-	public List<string> movieIds;
 	//this must be initialized when conneted with server
 	private HashSet<string> favs;
 	private HashSet<string> dislikes;
@@ -24,52 +23,57 @@ public class infoContainer : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 		favs = new HashSet<string>();
 		dislikes = new HashSet<string>();
-		movieIds = new List<string>();
 	}
-	
-	public static bool inFavorites(string target) {
-		return instance.favs.Contains(target);	
+
+	#region list related static functions
+	public static bool inFavorites(movieInfo target) {
+		return instance.favs.Contains(target.id);	
 	}
 
 	public static void addToMyFav(movieInfo target) {
-		instance.favs.Add(target.movie_title);
+		instance.favs.Add(target.id);
 		developerLogs.log("send to server add target");
 	}
 
 	public static void removeFromFav(movieInfo target) {
-		instance.favs.Remove(target.movie_title);
+		instance.favs.Remove(target.id);
 		developerLogs.log("send to server remove target");
 	}
 
 	public static void addToDislike(movieInfo target){
-		instance.dislikes.Add(target.movie_title);
+		instance.dislikes.Add(target.id);
 		developerLogs.log("send to server dislike target");
 	}
 
 	public static bool isDislike(movieInfo target){
-		return instance.dislikes.Contains(target.movie_title);		
+		return instance.dislikes.Contains(target.id);		
 	}
 
 	public static void removeFromDislike(movieInfo target) {
-		instance.dislikes.Remove(target.movie_title);
+		instance.dislikes.Remove(target.id);
 		developerLogs.log("send to server remove target");
 	}
+	#endregion
 
+	public void initLists(){
+		updateLocalList("liked", favs);
+		updateLocalList("disliked", dislikes);
+	}
 
 	private void updateHashSet(HashSet<string> targetList, List<movieInfo> requestList) {
 		foreach (movieInfo mi in requestList)
-			targetList.Add(mi.movie_title);
+			targetList.Add(mi.id);
 	}
 
-	public void updateRecList() {
+	public void updateRecList(List<movieInfo> movieIds, int n = 5) {
 		WWWForm form = new WWWForm();
 		for (int i = 0; i < movieIds.Count; i++) {
-			form.AddField("movieIds", movieIds[i]);
+			form.AddField("movieIds", movieIds[i].id);
 		}
 		
-		form.AddField("n", 3);
-		form.AddField("longitude", 0);
-		form.AddField("latitude", 0);
+		form.AddField("n", n);
+		form.AddField("longitude", Input.location.lastData.longitude.ToString());
+		form.AddField("latitude", Input.location.lastData.altitude.ToString());
 		IEnumerator c = requestRecommendation(form);
 		StartCoroutine(c);		
 	}
@@ -83,7 +87,7 @@ public class infoContainer : MonoBehaviour {
 		if (w.error == ""){
 			recommendation recommendResult = JsonUtility.FromJson<recommendation>(w.text);
 			recommendList =recommendResult.outputMovies;
-			Debug.Log(w.text);
+			//update recommendation list
 			mainController.instance.recommend.recommendHelper.createTags(recommendList.Count, recommendList);
 		}
 		else
@@ -102,7 +106,6 @@ public class infoContainer : MonoBehaviour {
 		WWW w = new WWW(server + parseSearchQuery(s,n), null, header);
 		yield return w;
 		if (w.error == ""){
-			Debug.Log(w.text);
 			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":"+w.text+"}");
 			searchResult = result.myList;
 			searchController.instance.searchBar.updateBarContent(searchResult);
@@ -111,8 +114,35 @@ public class infoContainer : MonoBehaviour {
 			Debug.LogWarning(w.error);
 	}
 
+	//wrapper function
+	void updateLocalList(string listName, HashSet<string> targetList) {
+		IEnumerator c = updateMovieList(listName, targetList);
+		StartCoroutine(c);
+	}
+	
+	IEnumerator updateMovieList(string listName, HashSet<string> targetList) {
+		//authorization
+		Dictionary<string, string> header = new Dictionary<string, string>();
+		header["Authorization"] = "Bearer " + token;
+
+		WWW w = new WWW(server + parseListUpdateQuery(listName), null, header);
+		yield return w;
+
+		if (w.error == ""){
+			Debug.Log(w.text);
+			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":" + w.text + "}");
+			updateHashSet(targetList, result.myList);
+		}
+		else
+			Debug.LogWarning(w.error);
+	}
+
 	string parseSearchQuery(string s, int n) {
 		return "/movies?q=" + s + "&n=" + n.ToString();
+	}
+
+	string parseListUpdateQuery(string listName){
+		return "/users/"+ usrInfo.id + "/movies/"+listName;
 	}
 }
 

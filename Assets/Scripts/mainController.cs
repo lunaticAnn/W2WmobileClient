@@ -40,7 +40,7 @@ public class mainController : MonoBehaviour {
 			previousController = from;
 		}
 		if (!toActivate) {
-			developerLogs.log("No previous state found, check the FSM.");
+			Debug.LogWarning("No previous state found, check the FSM.");
 			return false;
 		}
 		toActivate.enterState();
@@ -53,8 +53,6 @@ public class mainController : MonoBehaviour {
 	*/
 	private void Start(){
 		installHandlers();
-		infoContainer.instance.updateRecList();
-		//recommend.recommendHelper.createTags(5);
 	}
 
 	void installHandlers() {
@@ -75,14 +73,14 @@ public class mainController : MonoBehaviour {
 		if (activeController != search)
 			changeStateTo(recommend, activeController);
 		else
-			developerLogs.log("Is in search mode, other operations are banned.");
+			Debug.Log("Is in search mode, other operations are banned.");
 	}
 
 	private void viewLocationHandler(){
 		if (activeController != search)
 			changeStateTo(location, activeController);
 		else
-			developerLogs.log("Is in search mode, other operations are banned.");
+			Debug.Log("Is in search mode, other operations are banned.");
 	}
 
 	#region server connections

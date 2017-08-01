@@ -146,6 +146,8 @@ public class UIcontroller : MonoBehaviour {
 			loginResponse lr = JsonUtility.FromJson<loginResponse>(w.text);
 			infoContainer.instance.usrInfo = lr.user;
 			infoContainer.instance.token = lr.token;
+			//initialize like/ dislike list
+			infoContainer.instance.initLists();
 			SceneManager.LoadScene("main");
 		}
 			
