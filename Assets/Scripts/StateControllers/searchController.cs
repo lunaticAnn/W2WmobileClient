@@ -82,14 +82,18 @@ public class searchController : baseController {
 	
 	void queryNewSearch() {
 		//send searching query
-		infoContainer.instance.updateRecList(searchTags);
+		StartCoroutine("newSearch");		
+		//================== testing like / dislike ============================
+		
+	}
 
+	IEnumerator newSearch() { 
+		yield return mainController.instance.recommend.recommendHelper.clearTags();
+		infoContainer.instance.updateRecList(searchTags,20);
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		mainController.instance.recommend.recommendHelper.clearTags();
-		
-		//================== testing like / dislike ============================
-		mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);	
+		Debug.Log("creating search tags:" + searchTags.Count);
+		//mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);
 	}
 	#endregion
 }

@@ -13,6 +13,7 @@ public class locationController : baseController
 			instance = this;
 		else
 			Destroy(gameObject);
+		locationHelper.clearTags();
 	}
 	//singleton
 
@@ -24,14 +25,13 @@ public class locationController : baseController
 		base.enterState();
 		//switch to location panel
 		locationField.SetActive(true);
-		locationHelper.clearTags();
-		infoContainer.instance.getNearbyTrending(1f);
-		
+		locationHelper.refreshViewedTab();
 	}
 
 	public override void inputEventHandler(){
 		//get the input event data and parse it to responses
-		
+		locationHelper.clearTags();
+		infoContainer.instance.getNearbyTrending(1f);
 	}
 
 	public override void exitState()

@@ -80,9 +80,11 @@ public class mainController : MonoBehaviour {
 	}
 
 	private void viewLocationHandler(){
-		if (activeController != search)
+		if (activeController == location)
+			location.inputEventHandler();
+		else if (activeController != search)
 			changeStateTo(location, activeController);
-		else
+		else 
 			Debug.Log("Is in search mode, other operations are banned.");
 	}
 

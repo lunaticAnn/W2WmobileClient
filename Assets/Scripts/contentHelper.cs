@@ -27,7 +27,7 @@ public class contentHelper : MonoBehaviour {
 	}
 	
 	public void createTags(int num, List<movieInfo> targetInfo) {
-		//Debug.Log("get create tag request, for :" + num);
+		Debug.Log("get create tag request, for :" + num);
 		if (num == 0) return;
 		//shrink content size
 		int cCount = transform.childCount;
@@ -48,7 +48,8 @@ public class contentHelper : MonoBehaviour {
 				newTag = Instantiate(tagTemplate);
 				newTag.transform.SetParent(transform);
 				newTag.GetComponent<movieTab>().myIndex = i;
-				newTag.GetComponent<movieTab>().updateUI(targetInfo[i]);				
+				//Debug.Log("creating:"+i);
+				newTag.GetComponent<movieTab>().updateUI(targetInfo[i - cCount]);				
 				newTag.name = "tab0";				
 			}
 			else {
@@ -62,13 +63,14 @@ public class contentHelper : MonoBehaviour {
 		}			
 	}
 
-	public void clearTags() {
+	public bool clearTags() {
 		int i = 1;
 		while (i < transform.childCount) {
 			Destroy(transform.GetChild(i).gameObject);
 			i++;
 		}
-		transform.GetChild(0).gameObject.SetActive(false);	
+		transform.GetChild(0).gameObject.SetActive(false);
+		return true;
 	}
 
 /// <summary>

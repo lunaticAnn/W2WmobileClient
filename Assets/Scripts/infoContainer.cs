@@ -93,6 +93,7 @@ public class infoContainer : MonoBehaviour {
 			recommendation recommendResult = JsonUtility.FromJson<recommendation>(w.text);
 			recommendList =recommendResult.outputMovies;
 			//update recommendation list
+			Debug.Log(w.text);
 			mainController.instance.recommend.recommendHelper.createTags(recommendList.Count, recommendList);
 		}
 		else
@@ -201,7 +202,6 @@ public class infoContainer : MonoBehaviour {
 		if (w.error == ""){
 			//Debug.Log(w.text);
 			List<movieWithCount> result = JsonUtility.FromJson<nearByReponse>(w.text).topLikedMovies;
-			Debug.Log("result:" + result.Count);
 			List<movieInfo> res = new List<movieInfo>();
 			for (int i = 0; i < result.Count; i++) {
 				res.Add(result[i].movie);

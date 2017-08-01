@@ -21,8 +21,7 @@ public class recommendController : baseController
 	//maintain for refreshing status
 	
 
-	public override void enterState()
-	{
+	public override void enterState(){
 		//do the registration here? on the main controller for current state
 		base.enterState();
 		recommendField.SetActive(true);

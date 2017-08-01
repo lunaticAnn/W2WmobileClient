@@ -41,9 +41,9 @@ public class UIcontroller : MonoBehaviour {
 	public InputField signUpUserName;
 	public InputField signUpPwd;
 	public InputField signUpName;
-	public Text signUpParsed;
+	public Text errorMessage;
+	public InputField confirmPassword;
 
-	public string myPassword;
 
 	Button signUp;
 	Button signUpBack;
@@ -59,8 +59,6 @@ public class UIcontroller : MonoBehaviour {
 		signUpBack = StartScreenPanels[2].transform.GetChild(3).GetComponent<Button>();
 		logInSubmission  = StartScreenPanels[1].transform.GetChild(2).GetComponent<Button>();
 		signUpSubmission = StartScreenPanels[2].transform.GetChild(2).GetComponent<Button>();
-		//signUpPwd.textComponent.color = new Color(0, 0, 0, 0);
-		//signUpPwd.onValueChanged.AddListener(updateParsed);
 
 		clearPanels();
 		ChangePanel(0);
@@ -71,8 +69,8 @@ public class UIcontroller : MonoBehaviour {
 		logInSubmission.onClick.AddListener(delegate { confirmLogIn(logInType.native); });
 		signUpSubmission.onClick.AddListener(confirmSignUp);
 
-		submitLogIn("a@b.com", "11111111");
-		
+		//submitLogIn("a@b.com", "11111111");
+		errorMessage.text = "";
 		Input.location.Start();
 	}
 
@@ -88,7 +86,8 @@ public class UIcontroller : MonoBehaviour {
 			return;
 		}
 		clearPanels();
-		StartScreenPanels[idx].SetActive(true);		
+		StartScreenPanels[idx].SetActive(true);
+		errorMessage.text = "";		
 	}
 
 	void confirmLogIn(logInType myType) {
@@ -109,18 +108,17 @@ public class UIcontroller : MonoBehaviour {
 		}
 	}
 
-	void updateParsed(string s) {
-		signUpParsed.text="";
-		for (int i = 0; i < s.Length; i++)
-			signUpPwd.text += "*";
-	}
 
 	void confirmSignUp(){
 		if (locker) return;
 		string userName = signUpUserName.text;
 		string pwd = signUpPwd.text;
 		string name = signUpName.text;
-		
+		string cPwd = confirmPassword.text;
+		if (cPwd != pwd){
+			errorMessage.text = "Passwords don't match.";
+			return;
+		}
 		submitSignUp(userName, pwd, name);		
 	}
 
@@ -137,14 +135,27 @@ public class UIcontroller : MonoBehaviour {
 		StartCoroutine(c);
 	}
 
+	string parseError(string input) {
+		int idx = input.IndexOf("Error:");
+		if (idx == -1) {
+			return "";
+		}
+		int i = idx+6;
+		while (input[i] != '.'&&i<input.Length)
+			i++;
+		return input.Substring(idx + 6, i - idx - 5); 
+	}
+
 	IEnumerator sendForm(string api, WWWForm myform) {
 		WWW w = new WWW(infoContainer.server+api, myform);		
 		yield return w;
 		if (w.error != ""){
+			errorMessage.text = parseError(w.text);
 			Debug.LogWarning(w.error);
 		}
 		else {
 			//load new scene
+			errorMessage.text = "";
 			loginResponse lr = JsonUtility.FromJson<loginResponse>(w.text);
 			infoContainer.instance.usrInfo = lr.user;
 			infoContainer.instance.token = lr.token;
@@ -155,7 +166,7 @@ public class UIcontroller : MonoBehaviour {
 			
 		//unlock 
 		locker = false;
-		Debug.Log(w.text);
+		//Debug.Log(w.text);
 	}
 
 	void submitSignUp(string uid, string pwd, string name){
