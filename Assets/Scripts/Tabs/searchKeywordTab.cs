@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class searchKeywordTab : MonoBehaviour {
+public class searchKeywordTab : MonoBehaviour,IPointerDownHandler, IPointerUpHandler {
+	public movieInfo m;
+	public void OnPointerDown(PointerEventData e) {
+		searchController.instance.smallerDetailPanel.SetActive(true);
+		searchController.instance.updateDetailInfo(m);	
+	}
 
-	// Use this for initialization
-	void Start () {
-		
+	public void OnPointerUp(PointerEventData e) {
+		searchController.instance.smallerDetailPanel.SetActive(false);
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

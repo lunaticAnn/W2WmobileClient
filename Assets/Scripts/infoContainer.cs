@@ -105,32 +105,29 @@ public class infoContainer : MonoBehaviour {
 
 	#region send search query
 	//wrapper function 
-	public void sendSearchQuery(string s, int n, int i = 0){
-		IEnumerator c = searchMoviesByTitle(s, n, i);
+	public void sendSearchQuery(string s, int n, string b = "title"){
+		IEnumerator c = searchMoviesByTitle(s, n, b);
 		StartCoroutine(c);
 	}
 
-	IEnumerator searchMoviesByTitle(string s, int n, int i){
+	IEnumerator searchMoviesByTitle(string s, int n, string b){
 		Dictionary<string, string> header = new Dictionary<string, string>();
 		header["Authorization"] = "Bearer " + token;
 
-		WWW w = new WWW(server + parseSearchQuery(s,n,i), null, header);
+		WWW w = new WWW(server + parseSearchQuery(s,n,b), null, header);
 		yield return w;
 		if (w.error == ""){
 			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":"+w.text+"}");
-			searchResult = result.myList;
-			if (i != 1)
-				searchController.instance.searchBar.updateBarContent(searchResult);
-			else
-				recommendController.instance.recommendHelper.createTags(searchResult.Count, searchResult);
+			searchResult = result.myList;			
+			searchController.instance.searchBar.updateBarContent(searchResult);		
 		}
 		else
 			Debug.LogWarning(w.error);
 	}
 
-	string parseSearchQuery(string s, int n, int i){
-		if(i == 1) return "/movies?q=" + s + "&n=" + n.ToString()+"&i="+i.ToString(); 
-		return "/movies?q=" + s + "&n=" + n.ToString();
+	string parseSearchQuery(string s, int n,string b){
+		
+		return "/movies?q=" + s + "&b=" + b + "&n=" + n.ToString();
 	}
 	#endregion
 

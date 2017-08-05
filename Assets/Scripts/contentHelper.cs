@@ -114,8 +114,7 @@ public class contentHelper : MonoBehaviour {
 		}
 
 		if (transform.childCount < leastChildCount){
-			
-			//developerLogs.log("ask for more.");
+			Debug.Log("..");
 		}	
 	}
 	

@@ -7,6 +7,7 @@ public class searchController : baseController {
 	//singleton
 	public static searchController instance = null;
 	public searchBarContent searchBar;
+	public GameObject smallerDetailPanel;
 
 	private void Awake(){
 		if (instance == null)
@@ -55,18 +56,39 @@ public class searchController : baseController {
 		mainController.instance.startNewSearch.image.sprite = enterSearch;
 		//close the search panel 	
 	}
-	
-/// <summary>
-/// return true if there is eviction
-/// </summary>
-/// <returns></returns>
+
+	public void updateDetailInfo(movieInfo m) {
+		string tmp = "<size=35>";
+		tmp += m.movie_title+"</size>";
+		tmp += "(" + m.title_year.ToString() + ")\n";
+		tmp +="<color=#515151ff>"+ m.director_name+"</color>\n";
+		tmp += m.actor_1_name + "/" + m.actor_2_name + "/" + m.actor_3_name + "\n";
+		tmp += m.genres;
+		smallerDetailPanel.transform.GetChild(1).GetComponent<Text>().text = tmp;
+		IEnumerator c = updatePoster(m.image_url);
+		StartCoroutine(c);	
+	}
+	IEnumerator updatePoster(string url)
+	{
+		// Start a download of the given URL
+		WWW www = new WWW(url);
+		yield return www;
+		smallerDetailPanel.transform.GetChild(0).GetComponent<RawImage>().texture = www.texture;
+	}
+
+	/// <summary>
+	/// return true if there is eviction
+	/// </summary>
+	/// <returns></returns>
 	public void addSearchTag(movieInfo m) {
 		//update the search tag list
 		GameObject s = Instantiate(searchTab);
 		s.transform.SetParent(tabPanel, false);
 		RectTransform r = searchTab.GetComponent<RectTransform>();
 		r.localScale = Vector3.one;
-		s.GetComponent<Button>().onClick.AddListener(delegate { removeFromTags(m ,s); });
+		//set deleting button
+		s.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(delegate { removeFromTags(m ,s); });
+		s.GetComponent<searchKeywordTab>().m = m;
 		s.GetComponentInChildren<Text>().text = m.movie_title;
 		searchTags.Add(m);
 		updateTagArea();
@@ -94,7 +116,7 @@ public class searchController : baseController {
 
 	#region serverCommunication
 	void searchFullName(string inputKeyword) {
-		infoContainer.instance.sendSearchQuery(inputKeyword, 5);		
+		infoContainer.instance.sendSearchQuery(inputKeyword, 5, "title");		
 	}
 	
 	void queryNewSearch() {

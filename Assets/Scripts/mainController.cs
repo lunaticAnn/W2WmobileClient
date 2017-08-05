@@ -34,7 +34,8 @@ public class mainController : MonoBehaviour {
 		changeStateTo(recommend);
 
 		//initialize recommendation field
-		infoContainer.instance.sendSearchQuery("", 5, 1);
+		//change it to send like history 
+		infoContainer.instance.sendSearchQuery("", 5);
 		
 	}
  
