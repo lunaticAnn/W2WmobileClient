@@ -28,6 +28,7 @@ public class recommendController : baseController
 		base.enterState();
 		recommendField.SetActive(true);
 		recommendHelper.refreshViewedTab();
+
 		if (!initialized) {
 			infoContainer.instance.updateRecList();
 			initialized = true;

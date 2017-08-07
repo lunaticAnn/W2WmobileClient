@@ -26,7 +26,6 @@ public class searchController : baseController {
 	public InputField searchKeywords;
 	public Button confirmSearch;
 	public GameObject searchTab;
-	public Transform tabPanel;
 	public GameObject visionPanel;
 
 	public Sprite exitSearch;
@@ -61,26 +60,6 @@ public class searchController : baseController {
 		//close the search panel 	
 	}
 
-	public void updateDetailInfo(movieInfo m) {
-		string tmp = "<size=35>";
-		tmp += m.movie_title+"</size>";
-		tmp += "(" + m.title_year.ToString() + ")\n";
-		tmp +="<color=#515151ff>"+ m.director_name+"</color>\n";
-		tmp += m.actor_1_name + "/" + m.actor_2_name + "/" + m.actor_3_name + "\n";
-		tmp += m.genres;
-		smallerDetailPanel.transform.GetChild(1).GetComponent<Text>().text = tmp;
-		IEnumerator c = updatePoster(m.image_url);
-		StartCoroutine(c);	
-	}
-
-	IEnumerator updatePoster(string url)
-	{
-		// Start a download of the given URL
-		WWW www = new WWW(url);
-		yield return www;
-		smallerDetailPanel.transform.GetChild(0).GetComponent<RawImage>().texture = www.texture;
-	}
-
 	/// <summary>
 	/// return true if there is eviction
 	/// </summary>
@@ -96,19 +75,6 @@ public class searchController : baseController {
 	}
 
 
-	void updateTagArea() {
-		//display the search tags in the tag area				
-		for (int i = 0; i < searchTags.Count; i++) {
-			tabPanel.GetChild(i).GetComponent<RectTransform>().localPosition =
-			new Vector3(0f, 180f - 50 * i);
-		}
-		
-	}
-
-	void clearSearchPanel() {
-		for (int i = 0; i < tabPanel.childCount; i++)
-			Destroy(tabPanel.GetChild(i).gameObject);
-	}
 
 	void startPhotoSearch() {
 		visionPanel.SetActive(true);
@@ -133,10 +99,10 @@ public class searchController : baseController {
 	}
 	
 	void queryNewSearch() {
+		mainController.instance.recommend.initialized = true;
 		//send searching query
 		StartCoroutine("newSearch");
-		//================== testing like / dislike ============================	
-		mainController.instance.recommend.initialized = true;
+		//================== testing like / dislike ============================		
 	}
 
 	
@@ -149,7 +115,6 @@ public class searchController : baseController {
 			yield return new WaitForEndOfFrame();
 		}
 		mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);
-		infoContainer.instance.updateRecList();	
 	}
 
 

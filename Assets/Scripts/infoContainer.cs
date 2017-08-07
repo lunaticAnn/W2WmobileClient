@@ -96,6 +96,7 @@ public class infoContainer : MonoBehaviour {
 
 	IEnumerator requestRecommendation(WWWForm form) {
 		yield return mainController.instance.recommend.recommendHelper.clearTags();
+
 		Dictionary<string, string> header = form.headers;
 		header["Authorization"] = "Bearer " + token ;
 		byte[] rawData = form.data;
