@@ -40,6 +40,10 @@ public class movieInfo{
 	public string movie_imdb_link;
 	public string image_url;
 	public string description;
+
+	//spicific thing for update resource
+	public string resultFrom;
+	public string resultMemo;
 	#endregion
 
 	public static movieInfo createFromJson(string jsonString) {

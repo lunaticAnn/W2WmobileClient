@@ -10,6 +10,7 @@ public class locationController : baseController {
 	public static locationController instance = null;
 	public static float maxDistance = 20f, minDistance = 1f;
 
+	public Button viewNearby;
 	public Slider dist;
 	public Text distNum;
 	private void Awake() {
@@ -19,6 +20,7 @@ public class locationController : baseController {
 			Destroy(gameObject);
 		locationHelper.clearTags();
 		dist.onValueChanged.AddListener(updateDistNum);
+		viewNearby.image.color = new Color(0f, 0f, 0f);
 		initialized = false;
 	}
 	//singleton
@@ -30,6 +32,7 @@ public class locationController : baseController {
 	public override void enterState() {
 		//do the registration here? on the main controller for current state
 		base.enterState();
+		viewNearby.image.color = new Color(1f, 1f, 1f);
 		//switch to location panel
 		locationField.SetActive(true);
 		locationHelper.refreshViewedTab();
@@ -50,6 +53,7 @@ public class locationController : baseController {
 	{
 		//de-register on the main controller
 		base.exitState();
+		viewNearby.image.color = new Color(0f, 0f, 0f);
 		locationField.SetActive(false);
 	}
 

@@ -25,7 +25,6 @@ public class searchController : baseController {
 	public GameObject searchPanel;
 	public InputField searchKeywords;
 	public Button confirmSearch;
-	public GameObject searchTab;
 	public GameObject visionPanel;
 
 	public Sprite exitSearch;
@@ -100,6 +99,7 @@ public class searchController : baseController {
 	
 	void queryNewSearch() {
 		mainController.instance.recommend.initialized = true;
+		
 		//send searching query
 		StartCoroutine("newSearch");
 		//================== testing like / dislike ============================		
@@ -114,6 +114,7 @@ public class searchController : baseController {
 		while (!synchronizer) {
 			yield return new WaitForEndOfFrame();
 		}
+		infoContainer.instance.updateMixList(searchTags, "title", searchKeywords.text);
 		mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);
 	}
 

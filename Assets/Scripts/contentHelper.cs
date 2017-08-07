@@ -26,7 +26,7 @@ public class contentHelper : MonoBehaviour {
 		return myInfo;
 	}
 	
-	public void createTags(int num, List<movieInfo> targetInfo) {
+	public void createTags(int num, List<movieInfo> targetInfo, bool customize = false) {
 		Debug.Log("get create tag request, for :" + num);
 		if (num == 0) return;
 		//shrink content size
@@ -38,7 +38,7 @@ public class contentHelper : MonoBehaviour {
 		new Vector3(450f, -110f);
 		
 		if (transform.childCount == 1){
-			tagTemplate.GetComponent<movieTab>().updateUI(targetInfo[0]);
+			tagTemplate.GetComponent<movieTab>().updateUI(targetInfo[0], customize);
 			cCount = 0;
 		}
 
@@ -49,7 +49,7 @@ public class contentHelper : MonoBehaviour {
 				newTag.transform.SetParent(transform);
 				newTag.GetComponent<movieTab>().myIndex = i;
 				//Debug.Log("creating:"+i);
-				newTag.GetComponent<movieTab>().updateUI(targetInfo[i - cCount]);				
+				newTag.GetComponent<movieTab>().updateUI(targetInfo[i - cCount], customize);				
 				newTag.name = "tab0";				
 			}
 			else {
@@ -69,6 +69,7 @@ public class contentHelper : MonoBehaviour {
 			Destroy(transform.GetChild(i).gameObject);
 			i++;
 		}
+		transform.GetChild(0).GetComponent<Image>().sprite = mainController.instance.customizeBackground[0];
 		transform.GetChild(0).gameObject.SetActive(false);
 		return true;
 	}

@@ -23,6 +23,8 @@ public class mainController : MonoBehaviour {
 	public Button viewNearby;
 	public Button backToList;
 	public Button viewUserInfo;
+
+	public Sprite[] customizeBackground;
 	#endregion
 
 	//my event info structure
@@ -78,7 +80,7 @@ public class mainController : MonoBehaviour {
 
 	private void viewRecommendHandler(){
 		if (activeController == recommend) {
-			infoContainer.instance.updateRecList();
+			recommend.inputEventHandler();
 		}
 		else if (activeController != search)
 			changeStateTo(recommend, activeController);
@@ -99,6 +101,8 @@ public class mainController : MonoBehaviour {
 	private void userinfoHandler(){
 		if (activeController != user)
 			changeStateTo(user, activeController);
+		else
+			changeStateTo(previousController==null? recommend:previousController, activeController);
 	}
 	#region server connections
 

@@ -11,6 +11,12 @@ public class infoContainer : MonoBehaviour {
 	public List<movieInfo> recommendList;
 	public List<movieInfo> searchResult;
 
+	const int localLimitNum = 100;
+
+	List<movieInfo> mixList = new List<movieInfo>();
+	HashSet<string> mixId = new HashSet<string>();
+	
+	
 	//this must be initialized when conneted with server
 	private HashSet<string> favs;
 	private HashSet<string> dislikes;
@@ -67,6 +73,39 @@ public class infoContainer : MonoBehaviour {
 	}
 	#endregion
 
+	#region local mix List update [limited size]
+	public void updateMixList(List<movieInfo> targetList, string resourceFrom = "recommend", string memo = "") {
+		foreach (movieInfo m in targetList){
+			if (!mixId.Contains(m.id)){
+				m.resultFrom = resourceFrom;
+				if(memo!="")
+					m.resultMemo = memo;
+				mixList.Add(m);
+				mixId.Add(m.id);				
+			}
+			if (mixList.Count > localLimitNum){
+				//pop the least recent one
+				movieInfo mr = mixList[0];
+				mixList.Remove(mr);
+				mixId.Remove(mr.id);
+			}
+		}
+	}
+
+	public List<movieInfo> drawFromMixList(int n){
+		List<movieInfo> mixing = new List<movieInfo>();
+		while (n > 0 && mixList.Count > 0) {
+			int idx = Mathf.RoundToInt(Random.value * mixList.Count* 0.99f - 0.5f);
+			movieInfo m = mixList[idx];
+			mixing.Add(m);
+			mixList.Remove(m);
+			mixId.Remove(m.id);
+			n--;
+		}
+		return mixing;
+	}
+	#endregion
+
 	public void initLists(){
 		updateLocalList("liked", favs);
 		updateLocalList("disliked", dislikes);
@@ -80,21 +119,19 @@ public class infoContainer : MonoBehaviour {
 	#region update recommendation list
 	public void updateRecList(int n = 10) {
 		WWWForm form = new WWWForm();
-		int startIdx = localLikeList.Count > 3 ? localLikeList.Count - 4 :-1;
-		int endIdx = localLikeList.Count < 3 ? localLikeList.Count - 1 : startIdx + 3;
-		Debug.Log(startIdx+","+ endIdx);
-		for (int i = endIdx; i >startIdx; i--) {
-			form.AddField("movieIds", localLikeList[i].id);
-		}
+		if (localLikeList.Count == 0) return;
+		int idx = Mathf.RoundToInt(0.99f * Random.value * localLikeList.Count  - 0.5f);
 		
+		
+		form.AddField("movieIds", localLikeList[idx].id);				
 		form.AddField("n", n);
 		form.AddField("longitude", Input.location.lastData.longitude.ToString());
 		form.AddField("latitude", Input.location.lastData.altitude.ToString());
-		IEnumerator c = requestRecommendation(form);
+		IEnumerator c = requestRecommendation(form, localLikeList[idx].movie_title);
 		StartCoroutine(c);		
 	}
 
-	IEnumerator requestRecommendation(WWWForm form) {
+	IEnumerator requestRecommendation(WWWForm form, string memo = "") {
 		yield return mainController.instance.recommend.recommendHelper.clearTags();
 
 		Dictionary<string, string> header = form.headers;
@@ -107,7 +144,11 @@ public class infoContainer : MonoBehaviour {
 			recommendList =recommendResult.outputMovies;
 			//update recommendation list
 			Debug.Log(w.text);
-			mainController.instance.recommend.recommendHelper.createTags(recommendList.Count, recommendList);
+
+			//change it to update from mixed list
+			updateMixList(recommendList, "recommend", memo);
+			List<movieInfo> drawer = infoContainer.instance.drawFromMixList(10);
+			mainController.instance.recommend.recommendHelper.createTags(drawer.Count, drawer, true);
 		}
 		else
 			Debug.LogWarning(w.error);
@@ -136,6 +177,7 @@ public class infoContainer : MonoBehaviour {
 			}
 			else if (b == "actor") {
 				searchController.instance.storeResult(searchResult);
+				updateMixList(searchResult, "actor", s);				
 			}	
 		}
 		else
@@ -228,9 +270,12 @@ public class infoContainer : MonoBehaviour {
 			List<movieWithCount> result = JsonUtility.FromJson<nearByReponse>(w.text).topLikedMovies;
 			List<movieInfo> res = new List<movieInfo>();
 			for (int i = 0; i < result.Count; i++) {
+				result[i].movie.resultMemo = result[i].count.ToString() + " People nearby liked this";
 				res.Add(result[i].movie);
 			}
-			locationController.instance.locationHelper.createTags(res.Count, res);
+			locationController.instance.locationHelper.createTags(res.Count, res, true);
+			updateMixList(res, "location");
+			Debug.Log(mixList.Count);
 		}
 		else
 			Debug.LogWarning(w.error);

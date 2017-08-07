@@ -28,12 +28,22 @@ public class movieTab : MonoBehaviour {
 	}
 
 
-	public void updateUI(movieInfo m){
+	public void updateUI(movieInfo m, bool customize = false){
 		myInfo = m;
 		string tmp = "";
-		tmp += m.movie_title + "\n";
-		tmp += "Director : " + m.director_name + "\n";
-		tmp +=  m.title_year;
+		tmp += "<size=34>" + m.movie_title +"</size>" + " <size=28>("+m.title_year+")</size>\n";
+		tmp += "<color=#515151ff>" + m.director_name + "</color>\n";
+		int len = 0, i = 0;
+		while(i < 20) {
+			i = m.genres.IndexOf("|",i+1);
+			if (i == -1) {
+				len = m.genres.Length;
+				break; }
+			len = i;	
+		}
+		tmp += m.genres.Substring(0,len) + "\n";
+		if(customize)
+			tmp +=  "<size=24><color=#a6a6a6ff>"+m.resultMemo+"</color></size>";
 		movieDetails.text = tmp;
 
 		if (infoContainer.inFavorites(myInfo))
@@ -49,6 +59,25 @@ public class movieTab : MonoBehaviour {
 		deleteThisTab.onClick.RemoveAllListeners();
 		deleteThisTab.onClick.AddListener(deleteThis);
 		
+		if (customize) {
+			switch (m.resultFrom) {
+				case "recommend":
+					GetComponent<Image>().sprite = mainController.instance.customizeBackground[1];
+					break;
+				case "location":
+					GetComponent<Image>().sprite = mainController.instance.customizeBackground[2];
+					break;
+				case "actor":
+					GetComponent<Image>().sprite = mainController.instance.customizeBackground[3];
+					break;
+				case "title":
+					GetComponent<Image>().sprite = mainController.instance.customizeBackground[4];
+					break;
+				default:
+					GetComponent<Image>().sprite = mainController.instance.customizeBackground[0];
+					break;					
+			}
+		}
 		//update the poster
 		IEnumerator c = updatePoster(m.image_url);
 		StartCoroutine(c);
