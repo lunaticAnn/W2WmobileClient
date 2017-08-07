@@ -15,7 +15,7 @@ public class infoContainer : MonoBehaviour {
 	private HashSet<string> favs;
 	private HashSet<string> dislikes;
 
-	List<movieInfo> localLikeList;
+	public List<movieInfo> localLikeList;
 
 	void Awake () {
 		if (instance == null)
@@ -35,12 +35,18 @@ public class infoContainer : MonoBehaviour {
 	public static void addToMyFav(movieInfo target) {
 		instance.favs.Add(target.id);
 		instance.modifyTargetList(target, "add", "liked");
+		if (!instance.localLikeList.Contains(target)){
+				instance.localLikeList.Add(target);
+			}	
 		//developerLogs.log("send to server add target");
 	}
 
 	public static void removeFromFav(movieInfo target) {
 		instance.favs.Remove(target.id);
 		instance.modifyTargetList(target, "remove", "liked");
+		if (instance.localLikeList.Contains(target)){
+			instance.localLikeList.Remove(target);
+		}
 		//developerLogs.log("send to server remove target");
 	}
 
@@ -72,10 +78,13 @@ public class infoContainer : MonoBehaviour {
 	}
 
 	#region update recommendation list
-	public void updateRecList(List<movieInfo> movieInfos, int n = 5) {
+	public void updateRecList(int n = 5) {
 		WWWForm form = new WWWForm();
-		for (int i = 0; i < movieInfos.Count; i++) {
-			form.AddField("movieIds", movieInfos[i].id);
+		int startIdx = localLikeList.Count > 3 ? localLikeList.Count - 4:0;
+		int endIdx = localLikeList.Count < 3 ? localLikeList.Count : startIdx + 3;
+		Debug.Log(startIdx+","+ endIdx);
+		for (int i = startIdx; i < endIdx; i++) {
+			form.AddField("movieIds", localLikeList[i].id);
 		}
 		
 		form.AddField("n", n);
@@ -86,6 +95,7 @@ public class infoContainer : MonoBehaviour {
 	}
 
 	IEnumerator requestRecommendation(WWWForm form) {
+		yield return mainController.instance.recommend.recommendHelper.clearTags();
 		Dictionary<string, string> header = form.headers;
 		header["Authorization"] = "Bearer " + token ;
 		byte[] rawData = form.data;
@@ -117,12 +127,20 @@ public class infoContainer : MonoBehaviour {
 		WWW w = new WWW(server + parseSearchQuery(s,n,b), null, header);
 		yield return w;
 		if (w.error == ""){
-			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":"+w.text+"}");
-			searchResult = result.myList;			
-			searchController.instance.searchBar.updateBarContent(searchResult);		
+			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":" + w.text + "}");
+			searchResult = result.myList;
+			Debug.Log("search result contains:"+searchResult.Count);
+			if (b == "title"){			
+				searchController.instance.searchBar.updateBarContent(searchResult);
+			}
+			else if (b == "actor") {
+				searchController.instance.storeResult(searchResult);
+			}	
 		}
 		else
 			Debug.LogWarning(w.error);
+		searchController.instance.synchronizer = true;
+		
 	}
 
 	string parseSearchQuery(string s, int n,string b){
@@ -150,8 +168,8 @@ public class infoContainer : MonoBehaviour {
 			//Debug.Log(w.text);
 			movieList result = JsonUtility.FromJson<movieList>("{\"myList\":" + w.text + "}");
 			updateHashSet(targetList, result.myList);
-			
-			
+			if (listName == "liked") localLikeList = result.myList;
+			userInfoController.instance.synchronizer = true;
 		}
 		else
 			Debug.LogWarning(w.error);
@@ -168,6 +186,7 @@ public class infoContainer : MonoBehaviour {
 	public void modifyTargetList(movieInfo m,string action, string targetList) {
 		WWWForm form = new WWWForm();
 		//movieId, action, longitude, latitude
+		
 		form.AddField("movieId", m.id);
 		form.AddField("action", action);
 		form.AddField("longitude", Input.location.lastData.longitude.ToString());
@@ -191,6 +210,7 @@ public class infoContainer : MonoBehaviour {
 	#region get nearby trending
 	public void getNearbyTrending(float distance, int n = 5){
 		mainController.instance.location.locationHelper.clearTags();
+		Debug.Log(n);
 		IEnumerator c = getNearby(distance, n);
 		StartCoroutine(c);
 	}
@@ -201,6 +221,7 @@ public class infoContainer : MonoBehaviour {
 
 		WWW w = new WWW(server + parseNearby(distance,n), null, header);
 		yield return w;
+		
 		if (w.error == ""){
 			//Debug.Log(w.text);
 			List<movieWithCount> result = JsonUtility.FromJson<nearByReponse>(w.text).topLikedMovies;

@@ -9,6 +9,6 @@ public class distChanged : MonoBehaviour, IPointerUpHandler {
 
 	public void OnPointerUp(PointerEventData e) {
 		dist = GetComponent<Slider>();
-		infoContainer.instance.getNearbyTrending(locationController.sliderToDist(), 5);
+		locationController.instance.inputEventHandler();
 	}
 }

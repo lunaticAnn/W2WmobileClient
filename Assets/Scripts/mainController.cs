@@ -22,6 +22,7 @@ public class mainController : MonoBehaviour {
 	public Button viewRecommendation;
 	public Button viewNearby;
 	public Button backToList;
+	public Button viewUserInfo;
 	#endregion
 
 	//my event info structure
@@ -31,11 +32,10 @@ public class mainController : MonoBehaviour {
 			instance = this;
 		else
 			Destroy(gameObject);
-		changeStateTo(recommend);
+		changeStateTo(user);
 
 		//initialize recommendation field
 		//change it to send like history 
-		infoContainer.instance.sendSearchQuery("", 5);
 		
 	}
  
@@ -64,6 +64,8 @@ public class mainController : MonoBehaviour {
 		startNewSearch.onClick.AddListener(startSearchHandler);
 		viewRecommendation.onClick.AddListener(viewRecommendHandler);
 		viewNearby.onClick.AddListener(viewLocationHandler);
+		viewUserInfo.onClick.AddListener(userinfoHandler);
+
 		backToList.onClick.AddListener(delegate { changeStateTo(previousController, activeController); });
 	}
 
@@ -75,8 +77,12 @@ public class mainController : MonoBehaviour {
 	}
 
 	private void viewRecommendHandler(){
-		if (activeController != search)
+		if (activeController == recommend) {
+			infoContainer.instance.updateRecList();
+		}
+		else if (activeController != search)
 			changeStateTo(recommend, activeController);
+
 		else
 			Debug.Log("Is in search mode, other operations are banned.");
 	}
@@ -90,8 +96,12 @@ public class mainController : MonoBehaviour {
 			Debug.Log("Is in search mode, other operations are banned.");
 	}
 
+	private void userinfoHandler(){
+		if (activeController != user)
+			changeStateTo(user, activeController);
+	}
 	#region server connections
-	
+
 
 	#endregion
 }

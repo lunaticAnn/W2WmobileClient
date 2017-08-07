@@ -19,11 +19,13 @@ public class locationController : baseController {
 			Destroy(gameObject);
 		locationHelper.clearTags();
 		dist.onValueChanged.AddListener(updateDistNum);
+		initialized = false;
 	}
 	//singleton
 
 	public GameObject locationField;
 	public contentHelper locationHelper;
+	public bool initialized;
 
 	public override void enterState() {
 		//do the registration here? on the main controller for current state
@@ -31,14 +33,17 @@ public class locationController : baseController {
 		//switch to location panel
 		locationField.SetActive(true);
 		locationHelper.refreshViewedTab();
-	
-		updateDistNum(0f);		
+		updateDistNum(0f);
+		if (!initialized) {
+			initialized = true;
+			infoContainer.instance.getNearbyTrending(sliderToDist(), 10);
+		}
 	}
 
 	public override void inputEventHandler() {
 		//get the input event data and parse it to responses
 		locationHelper.clearTags();
-		infoContainer.instance.getNearbyTrending(sliderToDist(), 5);
+		infoContainer.instance.getNearbyTrending(sliderToDist(), 10);
 	}
 
 	public override void exitState()

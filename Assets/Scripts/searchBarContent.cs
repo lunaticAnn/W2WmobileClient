@@ -20,7 +20,8 @@ public class searchBarContent : MonoBehaviour {
 			}
 			else
 				transform.GetChild(i).gameObject.SetActive(false);
-		} 
+		}
+		searchController.instance.storeResult(searchResult);
 	}
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/*open detail panel if searched*/
 public class searchController : baseController {
 	//singleton
 	public static searchController instance = null;
@@ -14,7 +15,7 @@ public class searchController : baseController {
 			instance = this;
 		else
 			Destroy(gameObject);
-		//searchButton.onClick.AddListener(addSearchTag);
+		searchButton.onClick.AddListener(startPhotoSearch);
 		confirmSearch.onClick.AddListener(queryNewSearch);
 		searchKeywords.onValueChanged.AddListener(searchFullName);
 	}
@@ -26,9 +27,11 @@ public class searchController : baseController {
 	public Button confirmSearch;
 	public GameObject searchTab;
 	public Transform tabPanel;
+	public GameObject visionPanel;
 
 	public Sprite exitSearch;
 	public Sprite enterSearch;
+	public bool synchronizer = true;
 
 	List<movieInfo> searchTags = new List<movieInfo>();
 
@@ -39,9 +42,10 @@ public class searchController : baseController {
 		searchPanel.SetActive(true);
 		searchKeywords.text = "";
 		searchTags.Clear();
-		clearSearchPanel();
+		//clearSearchPanel();
 		mainController.instance.startNewSearch.image.sprite = exitSearch;
 		searchBar.updateBarContent(new List<movieInfo>());
+		visionPanel.SetActive(false);
 	}
 
 	public override void inputEventHandler(){
@@ -68,6 +72,7 @@ public class searchController : baseController {
 		IEnumerator c = updatePoster(m.image_url);
 		StartCoroutine(c);	
 	}
+
 	IEnumerator updatePoster(string url)
 	{
 		// Start a download of the given URL
@@ -81,19 +86,15 @@ public class searchController : baseController {
 	/// </summary>
 	/// <returns></returns>
 	public void addSearchTag(movieInfo m) {
-		//update the search tag list
-		GameObject s = Instantiate(searchTab);
-		s.transform.SetParent(tabPanel, false);
-		RectTransform r = searchTab.GetComponent<RectTransform>();
-		r.localScale = Vector3.one;
-		//set deleting button
-		s.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(delegate { removeFromTags(m ,s); });
-		s.GetComponent<searchKeywordTab>().m = m;
-		s.GetComponentInChildren<Text>().text = m.movie_title;
-		searchTags.Add(m);
-		updateTagArea();
-		searchKeywords.text = "";			
+	
+		Debug.Log("searchTags:" + searchTags.Count);
+		searchKeywords.text = m.movie_title;			
 	}
+
+	public void storeResult(List<movieInfo> toStore) {
+		searchTags = toStore;
+	}
+
 
 	void updateTagArea() {
 		//display the search tags in the tag area				
@@ -109,6 +110,11 @@ public class searchController : baseController {
 			Destroy(tabPanel.GetChild(i).gameObject);
 	}
 
+	void startPhotoSearch() {
+		visionPanel.SetActive(true);
+		visionPanel.transform.GetChild(0).GetComponent<WebCamTextureToCloudVision>().Initialize();
+	}
+	
 	void removeFromTags(movieInfo m, GameObject s) {
 		searchTags.Remove(m);
 		Destroy(s);
@@ -116,22 +122,36 @@ public class searchController : baseController {
 
 	#region serverCommunication
 	void searchFullName(string inputKeyword) {
-		infoContainer.instance.sendSearchQuery(inputKeyword, 5, "title");		
+		infoContainer.instance.sendSearchQuery(inputKeyword, 10, "title");		
+	}
+
+	public void searchForActor(string name) {
+		synchronizer = false;
+		infoContainer.instance.sendSearchQuery(name, 10, "actor");
+		StartCoroutine("newSearch");
+		mainController.instance.recommend.initialized = true;
 	}
 	
 	void queryNewSearch() {
 		//send searching query
-		StartCoroutine("newSearch");		
+		StartCoroutine("newSearch");
 		//================== testing like / dislike ============================	
+		mainController.instance.recommend.initialized = true;
 	}
 
-	IEnumerator newSearch() { 
-		yield return mainController.instance.recommend.recommendHelper.clearTags();
-		infoContainer.instance.updateRecList(searchTags,10);
+	
+
+	IEnumerator newSearch() {
 		mainController.instance.changeStateTo(mainController.instance.recommend,
 											  mainController.instance.activeController);
-		Debug.Log("creating search tags:" + searchTags.Count);
-		//mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);
+		yield return mainController.instance.recommend.recommendHelper.clearTags();
+		while (!synchronizer) {
+			yield return new WaitForEndOfFrame();
+		}
+		mainController.instance.recommend.recommendHelper.createTags(searchTags.Count, searchTags);
+		infoContainer.instance.updateRecList();	
 	}
+
+
 	#endregion
 }

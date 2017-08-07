@@ -7,12 +7,14 @@ public class recommendController : baseController
 {
 	//singleton
 	public static recommendController instance = null;
+	public bool initialized;
 	private void Awake()
 	{
 		if (instance == null)
 			instance = this;
 		else
 			Destroy(gameObject);
+		initialized = false;
 	}
 	//singleton
 
@@ -26,6 +28,11 @@ public class recommendController : baseController
 		base.enterState();
 		recommendField.SetActive(true);
 		recommendHelper.refreshViewedTab();
+		if (!initialized) {
+			infoContainer.instance.updateRecList();
+			initialized = true;
+		}
+			
 	}
 
 	public override void inputEventHandler() {
