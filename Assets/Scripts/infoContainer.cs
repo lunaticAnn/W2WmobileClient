@@ -78,12 +78,12 @@ public class infoContainer : MonoBehaviour {
 	}
 
 	#region update recommendation list
-	public void updateRecList(int n = 5) {
+	public void updateRecList(int n = 10) {
 		WWWForm form = new WWWForm();
-		int startIdx = localLikeList.Count > 3 ? localLikeList.Count - 4:0;
-		int endIdx = localLikeList.Count < 3 ? localLikeList.Count : startIdx + 3;
+		int startIdx = localLikeList.Count > 3 ? localLikeList.Count - 4 :-1;
+		int endIdx = localLikeList.Count < 3 ? localLikeList.Count - 1 : startIdx + 3;
 		Debug.Log(startIdx+","+ endIdx);
-		for (int i = startIdx; i < endIdx; i++) {
+		for (int i = endIdx; i >startIdx; i--) {
 			form.AddField("movieIds", localLikeList[i].id);
 		}
 		

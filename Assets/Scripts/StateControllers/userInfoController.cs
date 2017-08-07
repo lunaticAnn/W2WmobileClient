@@ -23,7 +23,7 @@ public class userInfoController : baseController
 	private void Start(){
 		welcome.text = "Welcome, " + infoContainer.instance.usrInfo.name;
 		mainController.instance.viewUserInfo.transform.GetChild(0).GetComponent<Text>().text
-		= infoContainer.instance.usrInfo.name;
+		= infoContainer.instance.usrInfo.name.Substring(0,1);
 		userInfoPanel.SetActive(true);
 	}
 

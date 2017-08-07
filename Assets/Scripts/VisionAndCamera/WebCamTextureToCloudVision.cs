@@ -91,7 +91,7 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 					}
 					actorName = tmp;
 					searchForIt.gameObject.SetActive(true);
-					searchForIt.transform.GetChild(0).GetComponent<Text>().text = "search for movie acted by:" + actorName;		
+					searchForIt.transform.GetChild(0).GetComponent<Text>().text = actorName;		
 				}				
 			}
 			else
